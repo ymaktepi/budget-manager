@@ -1,7 +1,7 @@
 import React from "react";
 import {Input} from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
-import { Add as AddIcon} from '@material-ui/icons';
+import {Add as AddIcon} from '@material-ui/icons';
 import "./entry-adder.css";
 
 interface IEntryAdderProps {
@@ -68,7 +68,7 @@ class EntryAdder extends React.Component<IEntryAdderProps, IExpenseAdderState> {
                 <div className={"align-center"}>
                     <IconButton aria-label={"Add"} onClick={this.addExpense}
                     >
-                        <AddIcon style={{color: "green"}} fontSize={"large"} />
+                        <AddIcon style={{color: "green"}} fontSize={"large"}/>
                     </IconButton>
                 </div>
             </>

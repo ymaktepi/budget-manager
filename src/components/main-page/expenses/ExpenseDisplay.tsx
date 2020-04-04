@@ -2,7 +2,7 @@ import React from "react";
 import {Grid} from "@material-ui/core";
 import {ICategoryFrame, IExpenseLog} from "../../../utils/types";
 import Paper from "@material-ui/core/Paper";
-import { Typography } from '@material-ui/core';
+import {Typography} from '@material-ui/core';
 import EntryAdder from "../common/EntryAdder";
 import moment from "moment";
 import "./expenses.css";
@@ -30,7 +30,8 @@ class ExpenseDisplay extends React.Component<IExpenseDisplayProps, {}> {
     render = () => {
         const frame = this.props.categoryFrame;
         const amountUsed = frame.expenses.reduce((sum, current) => sum + Number(current.amount), 0);
-        const listItems = frame.expenses.map(expense => (<li key={expense.name + expense.amount + expense.date.toISOString()}> {expense.name}, {expense.amount}</li>));
+        const listItems = frame.expenses.map(expense => (
+            <li key={expense.name + expense.amount + expense.date.toISOString()}> {expense.name}, {expense.amount}</li>));
         return <Grid item xs={12} sm={6} md={4}>
             <Paper className={"tile"}>
                 <Typography variant={"h5"}>
@@ -42,7 +43,7 @@ class ExpenseDisplay extends React.Component<IExpenseDisplayProps, {}> {
                 <ul>
                     {listItems}
                 </ul>
-                <EntryAdder placeholder={"Expense Name"} onNewEntry={this.handleNewEntry} />
+                <EntryAdder placeholder={"Expense Name"} onNewEntry={this.handleNewEntry}/>
             </Paper>
         </Grid>
     }

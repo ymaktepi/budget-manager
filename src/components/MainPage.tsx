@@ -30,7 +30,7 @@ interface IMainPageState {
 
 const SPREADSHEET_ID = "spreadsheetId";
 
-class MainPage extends React.Component<{}, IMainPageState>{
+class MainPage extends React.Component<{}, IMainPageState> {
     constructor(props: {}) {
         super(props);
         const client = getClientFromStorage();
@@ -50,7 +50,7 @@ class MainPage extends React.Component<{}, IMainPageState>{
     }
 
     private resetId = async () => {
-        if(this.state.spreadsheetId !== null) {
+        if (this.state.spreadsheetId !== null) {
             const data = await getAllData(this.state.sheets, this.state.spreadsheetId);
             if (data) {
                 this.setState({data});
@@ -87,7 +87,7 @@ class MainPage extends React.Component<{}, IMainPageState>{
             return;
         }
 
-        if(this.state.spreadsheetId !== null) {
+        if (this.state.spreadsheetId !== null) {
             if (await addCategory(this.state.sheets, this.state.spreadsheetId, category)) {
                 let categories = this.state.data;
                 categories.set(category.name, {category, expenses: []});
@@ -97,10 +97,10 @@ class MainPage extends React.Component<{}, IMainPageState>{
     };
 
     private addExpense = async (expenseLog: IExpenseLog) => {
-        if(this.state.spreadsheetId !== null) {
-            if(await addExpense(this.state.sheets, this.state.spreadsheetId, expenseLog)) {
+        if (this.state.spreadsheetId !== null) {
+            if (await addExpense(this.state.sheets, this.state.spreadsheetId, expenseLog)) {
                 let data = this.state.data;
-                if(data.has(expenseLog.category)) {
+                if (data.has(expenseLog.category)) {
                     // @ts-ignore
                     data.get(expenseLog.category).expenses.push(expenseLog);
                     this.setState({data});
@@ -111,18 +111,21 @@ class MainPage extends React.Component<{}, IMainPageState>{
 
     render() {
         return (
-            <div >
+            <div>
                 <AppBar position="static">
                     <Tabs value={this.state.tabIndex} onChange={this.handleTabChange} aria-label="simple tabs example">
-                        <Tab label="Expenses" disabled={!this.state.spreadsheetId} {...a11yProps(CONSTANTS.TAB_INDEXES.EXPENSES)} />
+                        <Tab label="Expenses"
+                             disabled={!this.state.spreadsheetId} {...a11yProps(CONSTANTS.TAB_INDEXES.EXPENSES)} />
                         <Tab icon={<SettingsIcon/>} {...a11yProps(CONSTANTS.TAB_INDEXES.SETTINGS)} />
                     </Tabs>
                 </AppBar>
                 <TabPanel value={this.state.tabIndex} index={CONSTANTS.TAB_INDEXES.EXPENSES}>
-                    <Expenses expensesData={this.state.data} addExpense={this.addExpense} addCategory={this.addCategory}/>
+                    <Expenses expensesData={this.state.data} addExpense={this.addExpense}
+                              addCategory={this.addCategory}/>
                 </TabPanel>
                 <TabPanel value={this.state.tabIndex} index={CONSTANTS.TAB_INDEXES.SETTINGS}>
-                    <Settings id={this.state.spreadsheetId} onIdChange={this.handleIdChange} createSpreadsheet={this.createSpreadsheet}/>
+                    <Settings id={this.state.spreadsheetId} onIdChange={this.handleIdChange}
+                              createSpreadsheet={this.createSpreadsheet}/>
                 </TabPanel>
             </div>
         );

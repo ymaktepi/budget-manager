@@ -31,7 +31,8 @@ class Expenses extends React.Component<IExpensesProps, {}> {
                 .map(sortedName => this.props.expensesData.get(sortedName))
                 .filter(frame => frame !== undefined)
                 // @ts-ignore does not recognise that frame cannot be undefined due to previous filter
-                .map(frame => <ExpenseDisplay categoryFrame={frame} key={frame.category.name} onNewExpense={this.props.addExpense} />);
+                .map(frame => <ExpenseDisplay categoryFrame={frame} key={frame.category.name}
+                                              onNewExpense={this.props.addExpense}/>);
         return (
             <Grid container spacing={3} alignItems={"baseline"} direction={"row"}>
                 {listExpensesDisplays}

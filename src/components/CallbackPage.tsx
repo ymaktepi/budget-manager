@@ -3,7 +3,7 @@ import {getNewClient, saveTokens} from "../utils/clientUtils";
 import {log, warn} from "../utils/simpleLogger";
 
 
-class CallbackPage extends React.Component{
+class CallbackPage extends React.Component {
     componentDidMount(): void {
         const url = new URL(window.location.href);
         const code = url.searchParams.get("code");

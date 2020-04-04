@@ -4,7 +4,7 @@ interface IErrorPageProps {
     message: string;
 }
 
-class ErrorPage extends React.Component<IErrorPageProps, any>{
+class ErrorPage extends React.Component<IErrorPageProps, any> {
 
     render() {
         return (

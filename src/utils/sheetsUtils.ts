@@ -39,7 +39,7 @@ export const createSpreadsheet = async (sheetsClient: sheets_v4.Sheets) => {
         const createdSheet = response.data;
         debug("createdSheet", createdSheet);
         const id = createdSheet.spreadsheetId;
-        if(id) {
+        if (id) {
             localStorage.setItem("spreadsheetId", id);
             return id;
         } else {
@@ -77,18 +77,18 @@ const appendRow = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, 
     });
 };
 
-const getPage = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, sheetIndex: string): Promise<Array<Array<any>>| undefined> => {
+const getPage = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, sheetIndex: string): Promise<Array<Array<any>> | undefined> => {
     const params: ParamsGetValues = {
         spreadsheetId,
         range: sheetIndex,
     };
 
-    return sheetsClient.spreadsheets.values.get(params).then( (response) => {
+    return sheetsClient.spreadsheets.values.get(params).then((response) => {
             if (!response.data) {
                 return undefined;
             } else {
                 const data = response.data;
-                if(!data || !data.values) {
+                if (!data || !data.values) {
                     return undefined;
                 }
                 return data.values as any[];//.flatMap(array => ({name: String(array[0]), amount: Number(array[1])}));
@@ -101,7 +101,7 @@ const getPage = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, sh
 export const getCategories = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string): Promise<ICategoryLog[] | undefined> => {
     debug("getCategories");
     const values = await getPage(sheetsClient, spreadsheetId, CURRENT_CATEGORIES);
-    if(values === undefined) {
+    if (values === undefined) {
         debug("categories are undefined");
         return undefined;
     }
@@ -111,7 +111,7 @@ export const getCategories = async (sheetsClient: sheets_v4.Sheets, spreadsheetI
 export const getExpenses = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string): Promise<IExpenseLog[] | undefined> => {
     debug("getExpenses");
     const values = await getPage(sheetsClient, spreadsheetId, CURRENT_EXPENSES);
-    if(values === undefined) {
+    if (values === undefined) {
         debug("Expenses are undefined");
         return undefined;
     }
@@ -122,9 +122,9 @@ export const getExpenses = async (sheetsClient: sheets_v4.Sheets, spreadsheetId:
     ));
 };
 
-export const getAllData = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string): Promise<Map<string, ICategoryFrame>| undefined> => {
+export const getAllData = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string): Promise<Map<string, ICategoryFrame> | undefined> => {
     const categoriesList = await getCategories(sheetsClient, spreadsheetId);
-    if(!categoriesList){
+    if (!categoriesList) {
         warn("could not get categories");
         return undefined;
     }
@@ -133,9 +133,9 @@ export const getAllData = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: 
     );
 
     const expenses = await getExpenses(sheetsClient, spreadsheetId);
-    if(expenses) {
+    if (expenses) {
         expenses.forEach(expense => {
-            if(data.has(expense.category)){
+            if (data.has(expense.category)) {
                 // @ts-ignore
                 data.get(expense.category).expenses.push(expense);
             } else {

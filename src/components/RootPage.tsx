@@ -8,7 +8,7 @@ import AuthorizationPage from "./AuthorizationPage";
 import CallbackPage from "./CallbackPage";
 import MainPage from "./MainPage";
 
-class RootPage extends React.Component{
+class RootPage extends React.Component {
 
     render() {
         return (

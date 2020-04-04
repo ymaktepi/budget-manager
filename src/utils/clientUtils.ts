@@ -22,7 +22,7 @@ export function getNewClient(): OAuth2Client {
 export function getClientFromStorage(): OAuth2Client | undefined {
     let client = getNewClient();
     const credentials = getTokensFromStorage();
-    if(!credentials) {
+    if (!credentials) {
         return undefined;
     }
     client.setCredentials(credentials);
@@ -45,23 +45,25 @@ export function regenerateToken() {
 }
 
 export function saveTokens(tokens: Credentials) {
+    debug("Saving tokens");
     localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(tokens));
 }
 
 function getTokensFromStorage(): Credentials | undefined {
     const tokens = localStorage.getItem(CREDENTIALS_KEY);
-    if(tokens === null) {
+    if (tokens === null) {
         debug("No tokens in storage");
         return undefined;
     }
     const credentials = JSON.parse(tokens) as Credentials;
-    if(credentials.expiry_date === undefined || credentials.expiry_date === null) {
+    if (credentials.expiry_date === undefined || credentials.expiry_date === null) {
         debug("No expiry date", credentials);
         return undefined;
     }
     const now = Date.now();
     if (credentials.expiry_date > now + MILLISECONDS_TO_EXPIRACY_RENEW) {
-        setTimeout(regenerateToken, credentials.expiry_date-now-MILLISECONDS_TO_EXPIRACY_RENEW);
+        debug("Setting timeout to ", credentials.expiry_date - now - MILLISECONDS_TO_EXPIRACY_RENEW);
+        setTimeout(regenerateToken, credentials.expiry_date - now - MILLISECONDS_TO_EXPIRACY_RENEW);
         return credentials;
     } else {
         debug(`expiry date: ${now} is not before ${credentials.expiry_date}`);
@@ -70,6 +72,6 @@ function getTokensFromStorage(): Credentials | undefined {
     }
 }
 
-export function redirectToAuth(){
+export function redirectToAuth() {
     window.location.replace("/auth");
 }
