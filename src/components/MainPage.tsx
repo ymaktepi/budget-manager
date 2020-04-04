@@ -8,17 +8,26 @@ import {a11yProps, TabPanel} from "./tabUtils";
 import {OAuth2Client} from "google-auth-library";
 import Settings from "./main-page/Settings";
 import SettingsIcon from '@material-ui/icons/Settings';
-import {addCategory, createSpreadsheet, getCategories} from "../utils/sheetsUtils";
-import {ICategory} from "../utils/types";
+import {addCategory, addExpense, createSpreadsheet, getAllData} from "../utils/sheetsUtils";
+import {ICategoryLog, IExpenseLog} from "../utils/types";
 import Category from "./main-page/Category";
 import {warn} from "../utils/simpleLogger";
+import Expenses from "./main-page/Expenses";
+
+const CONSTANTS = {
+    TAB_INDEXES: {
+        EXPENSES: 0,
+        CATEGORIES: 1,
+        SETTINGS: 2,
+    },
+};
 
 interface IMainPageState {
-    value: number;
+    tabIndex: number;
     client: OAuth2Client;
     spreadsheetId: string | null;
     sheets: sheets_v4.Sheets;
-    categories: ICategory[];
+    data: Map<string, [ICategoryLog, IExpenseLog[]]>;
 }
 
 class MainPage extends React.Component<{}, IMainPageState>{
@@ -31,28 +40,32 @@ class MainPage extends React.Component<{}, IMainPageState>{
         }
         const spreadsheetId = localStorage.getItem("spreadsheetId");
         const sheets = google.sheets({version: "v4", auth: client});
-        const categories: ICategory[] = [];
-        this.state = {value: spreadsheetId?1:0, client, spreadsheetId, sheets, categories};
+        const data = new Map();
+        const tabIndex = spreadsheetId ? CONSTANTS.TAB_INDEXES.EXPENSES : CONSTANTS.TAB_INDEXES.SETTINGS;
+        this.state = {tabIndex: tabIndex, client, spreadsheetId, sheets, data};
     }
 
     async componentDidMount() {
-        if(this.state.spreadsheetId !== null) {
-            const categories = await getCategories(this.state.sheets, this.state.spreadsheetId);
-            if (categories) {
-                this.setState({categories});
-            } else {
-                warn("could not get categories");
-            }
-        }
+        this.resetId();
     }
 
-    private handleTabChange = (_: any, newValue: any) => {
-        this.setState({value: newValue});
+    private resetId = async () => {
+        if(this.state.spreadsheetId !== null) {
+            const data = await getAllData(this.state.sheets, this.state.spreadsheetId);
+            if (data) {
+                this.setState({data});
+            }
+        }
     };
 
-    private handleIdChange = (id: string) => {
+    private handleTabChange = (_: any, newValue: any) => {
+        this.setState({tabIndex: newValue});
+    };
+
+    private handleIdChange = async (id: string) => {
         localStorage.setItem("spreadsheetId", id);
         this.setState({spreadsheetId: id});
+        this.resetId();
     };
 
     private createSpreadsheet = async () => {
@@ -62,55 +75,57 @@ class MainPage extends React.Component<{}, IMainPageState>{
         }
     };
 
-    private addCategory = async (category: ICategory) => {
-        const index = this.state.categories.map(cat => cat.name).indexOf(category.name);
-        // category already exists
-        if (index >= 0 || category.name === "") {
+    private addCategory = async (category: ICategoryLog) => {
+        if (category.name === "") {
             warn("Category already present");
             return;
         }
+        const categories = Array.from(this.state.data.keys());
+        const index = categories.indexOf(category.name);
+        if (index >= 0) {
+            warn("Category already present");
+            return;
+        }
+
         if(this.state.spreadsheetId !== null) {
             if (await addCategory(this.state.sheets, this.state.spreadsheetId, category)) {
-                let categories = this.state.categories.slice();
-                categories.push(category);
-                console.log(categories);
-                this.setState({categories});
+                let categories = this.state.data;
+                categories.set(category.name, [category, []]);
+                this.setState({data: categories});
+            }
+        }
+    };
+
+    private addExpense = async (category: ICategoryLog, name: string, amount: number) => {
+        if(this.state.spreadsheetId !== null) {
+            if(await addExpense(this.state.sheets, this.state.spreadsheetId, name, amount, new Date(), category)) {
             }
         }
     };
 
     render() {
-       return (
-           <div >
-               <AppBar position="static">
-                   <Tabs value={this.state.value} onChange={this.handleTabChange} aria-label="simple tabs example">
-                       <Tab icon={<SettingsIcon/>} {...a11yProps(0)} />
-                       {
-                           this.state.spreadsheetId && (<Tab label="Expenses" {...a11yProps(1)} />)
-                       }
-                       {
-                           this.state.spreadsheetId && (<Tab label="Categories" {...a11yProps(2)} />)
-                       }
-                   </Tabs>
-               </AppBar>
-               <TabPanel value={this.state.value} index={0}>
-                   <Settings id={this.state.spreadsheetId} onIdChange={this.handleIdChange} createSpreadsheet={this.createSpreadsheet}/>
-               </TabPanel>
-               {
-                   this.state.spreadsheetId && (
-                       <TabPanel value={this.state.value} index={1}>
-                           Expenses
-                       </TabPanel>
-                   )}
-               {
-                   this.state.spreadsheetId && (
-                       <TabPanel value={this.state.value} index={2}>
-                           <Category categories={this.state.categories} addCategory={this.addCategory}/>
-                       </TabPanel>
-                   )
-               }
-           </div>
-       );
+        const expensesData = new Map<ICategoryLog, IExpenseLog[]>();
+        const categories = Array.from(this.state.data.values()).map(v => v[0]);
+        return (
+            <div >
+                <AppBar position="static">
+                    <Tabs value={this.state.tabIndex} onChange={this.handleTabChange} aria-label="simple tabs example">
+                        <Tab label="Expenses" disabled={!this.state.spreadsheetId} {...a11yProps(CONSTANTS.TAB_INDEXES.EXPENSES)} />
+                        <Tab label="Categories" disabled={!this.state.spreadsheetId} {...a11yProps(CONSTANTS.TAB_INDEXES.CATEGORIES)} />
+                        <Tab icon={<SettingsIcon/>} {...a11yProps(CONSTANTS.TAB_INDEXES.SETTINGS)} />
+                    </Tabs>
+                </AppBar>
+                <TabPanel value={this.state.tabIndex} index={CONSTANTS.TAB_INDEXES.EXPENSES}>
+                    <Expenses expensesData={expensesData} />
+                </TabPanel>
+                <TabPanel value={this.state.tabIndex} index={CONSTANTS.TAB_INDEXES.CATEGORIES}>
+                    <Category categories={categories} addCategory={this.addCategory}/>
+                </TabPanel>
+                <TabPanel value={this.state.tabIndex} index={CONSTANTS.TAB_INDEXES.SETTINGS}>
+                    <Settings id={this.state.spreadsheetId} onIdChange={this.handleIdChange} createSpreadsheet={this.createSpreadsheet}/>
+                </TabPanel>
+            </div>
+        );
     }
 
 }

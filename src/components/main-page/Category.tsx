@@ -1,10 +1,10 @@
 import React from "react";
-import {ICategory} from "../../utils/types";
+import {ICategoryLog} from "../../utils/types";
 import {Button, Input} from "@material-ui/core";
 
 interface ICategoryProps {
-    categories: ICategory[];
-    addCategory: (category: ICategory) => void;
+    categories: ICategoryLog[];
+    addCategory: (category: ICategoryLog) => void;
 }
 
 interface ICategoryState {
@@ -47,7 +47,7 @@ class Category extends React.Component<ICategoryProps , ICategoryState> {
     }
 }
 
-const CategoryItem = (props: ICategory) => {
+const CategoryItem = (props: ICategoryLog) => {
     const name = props.name;
     const amount = props.amount;
     return (

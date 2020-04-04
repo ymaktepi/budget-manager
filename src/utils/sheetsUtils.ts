@@ -6,7 +6,8 @@ import {
     INDEX_CURRENT_EXPENSES
 } from "../components/constants";
 import {debug, warn} from "./simpleLogger";
-import {ICategory} from "./types";
+import {ICategoryLog, IExpenseLog} from "./types";
+import {prependListener} from "cluster";
 
 type ParamsCreateSheet = sheets_v4.Params$Resource$Spreadsheets$Create;
 type ParamsGetValues = sheets_v4.Params$Resource$Spreadsheets$Values$Get;
@@ -48,12 +49,24 @@ export const createSpreadsheet = async (sheetsClient: sheets_v4.Sheets) => {
     });
 };
 
-export const addCategory = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, category: ICategory) => {
+export const addCategory = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, category: ICategoryLog) => {
+    debug("addCategory", category);
+    const row = [category.name, category.amount];
+    return appendRow(sheetsClient, spreadsheetId, CURRENT_CATEGORIES, row);
+};
+
+export const addExpense = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, name: string, amount: number, date: Date, category: ICategoryLog) => {
+    debug("addExpense", name, amount, date, category);
+    const row = [date, category.name, name, amount];
+    return appendRow(sheetsClient, spreadsheetId, CURRENT_EXPENSES, row);
+};
+
+const appendRow = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, sheetIndex: string, row: any[]) => {
     const params: ParamsAppendValues = {
         spreadsheetId,
-        range: CURRENT_CATEGORIES,
+        range: sheetIndex,
         requestBody: {
-            values: [[category.name, category.amount]],
+            values: [row],
         },
         valueInputOption: "RAW",
     };
@@ -63,10 +76,10 @@ export const addCategory = async (sheetsClient: sheets_v4.Sheets, spreadsheetId:
     });
 };
 
-export const getCategories = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string) => {
+const getPage = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, sheetIndex: string): Promise<Array<Array<any>>| undefined> => {
     const params: ParamsGetValues = {
         spreadsheetId,
-        range: CURRENT_CATEGORIES,
+        range: sheetIndex,
     };
 
     return sheetsClient.spreadsheets.values.get(params).then( (response) => {
@@ -77,8 +90,54 @@ export const getCategories = async (sheetsClient: sheets_v4.Sheets, spreadsheetI
                 if(!data || !data.values) {
                     return undefined;
                 }
-                return data.values.flatMap(array => ({name: String(array[0]), amount: Number(array[1])}));
+                return data.values as any[];//.flatMap(array => ({name: String(array[0]), amount: Number(array[1])}));
             }
         }
     );
+};
+
+export const getCategories = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string): Promise<ICategoryLog[] | undefined> => {
+    debug("getCategories");
+    const values = await getPage(sheetsClient, spreadsheetId, CURRENT_CATEGORIES);
+    if(values === undefined) {
+        debug("categories are undefined");
+        return undefined;
+    }
+    return values.flatMap(array => ({name: String(array[0]), amount: Number(array[1])}));
+};
+
+export const getExpenses = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string): Promise<IExpenseLog[] | undefined> => {
+    debug("getExpenses");
+    const values = await getPage(sheetsClient, spreadsheetId, CURRENT_EXPENSES);
+    if(values === undefined) {
+        debug("Expenses are undefined");
+        return undefined;
+    }
+    return values.flatMap(array => ({date: new Date(array[0]), category: String(array[1]), name: String(array[2]), amount: Number(array[3])}));
+};
+
+export const getAllData = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string): Promise<Map<string, [ICategoryLog, IExpenseLog[]]>| undefined> => {
+    const categoriesList = await getCategories(sheetsClient, spreadsheetId);
+    if(!categoriesList){
+        warn("could not get categories");
+        return undefined;
+    }
+    const data = new Map<string, [ICategoryLog, IExpenseLog[]]>(
+        categoriesList.map(category => [category.name, [category, []]])
+    );
+
+    const expenses = await getExpenses(sheetsClient, spreadsheetId);
+    if(expenses) {
+        expenses.forEach(expense => {
+            if(data.has(expense.name)){
+                // @ts-ignore
+                data.get(expense.name)[1].push(expense);
+            } else {
+                warn("Category not found for expense: ", expense);
+            }
+        });
+    } else {
+        warn("could not get expenses");
+    }
+    return data;
 };
