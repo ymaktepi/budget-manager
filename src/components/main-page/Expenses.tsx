@@ -3,6 +3,7 @@ import {ICategoryLog, IExpenseLog} from "../../utils/types";
 
 interface IExpensesProps {
     expensesData: Map<ICategoryLog, IExpenseLog[]>;
+    addExpense: (expense: IExpenseLog) => void;
 }
 
 class Expenses extends React.Component<IExpensesProps, {}> {

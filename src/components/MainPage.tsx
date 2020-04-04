@@ -96,9 +96,10 @@ class MainPage extends React.Component<{}, IMainPageState>{
         }
     };
 
-    private addExpense = async (category: ICategoryLog, name: string, amount: number) => {
+    private addExpense = async (expenseLog: IExpenseLog) => {
         if(this.state.spreadsheetId !== null) {
-            if(await addExpense(this.state.sheets, this.state.spreadsheetId, name, amount, new Date(), category)) {
+            if(await addExpense(this.state.sheets, this.state.spreadsheetId, expenseLog)) {
+
             }
         }
     };
@@ -116,7 +117,7 @@ class MainPage extends React.Component<{}, IMainPageState>{
                     </Tabs>
                 </AppBar>
                 <TabPanel value={this.state.tabIndex} index={CONSTANTS.TAB_INDEXES.EXPENSES}>
-                    <Expenses expensesData={expensesData} />
+                    <Expenses expensesData={expensesData} addExpense={this.addExpense}/>
                 </TabPanel>
                 <TabPanel value={this.state.tabIndex} index={CONSTANTS.TAB_INDEXES.CATEGORIES}>
                     <Category categories={categories} addCategory={this.addCategory}/>

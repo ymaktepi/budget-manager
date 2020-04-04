@@ -55,9 +55,9 @@ export const addCategory = async (sheetsClient: sheets_v4.Sheets, spreadsheetId:
     return appendRow(sheetsClient, spreadsheetId, CURRENT_CATEGORIES, row);
 };
 
-export const addExpense = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, name: string, amount: number, date: Date, category: ICategoryLog) => {
-    debug("addExpense", name, amount, date, category);
-    const row = [date, category.name, name, amount];
+export const addExpense = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, expenseLog: IExpenseLog) => {
+    debug("addExpense", expenseLog);
+    const row = [expenseLog.date, expenseLog.category, expenseLog.name, expenseLog.amount];
     return appendRow(sheetsClient, spreadsheetId, CURRENT_EXPENSES, row);
 };
 
