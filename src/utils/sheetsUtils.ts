@@ -69,7 +69,7 @@ const appendRow = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, 
         requestBody: {
             values: [row],
         },
-        valueInputOption: "RAW",
+        valueInputOption: "USER_ENTERED",
     };
 
     return sheetsClient.spreadsheets.values.append(params).then((response) => {
