@@ -1,21 +1,21 @@
 import React from 'react';
 import {getNewClient, saveTokens} from "../utils/clientUtils";
+import {log, warn} from "../utils/simpleLogger";
 
 
 class CallbackPage extends React.Component{
     componentDidMount(): void {
         const url = new URL(window.location.href);
         const code = url.searchParams.get("code");
-        console.log("code", code);
         if (!code) {
-            console.log("Did not receive any code from google auth.");
+            warn("Did not receive any code from google auth.");
             return;
         }
         getNewClient().getToken(code, (err, tokens) => {
             if (err || !tokens) {
-                console.log("NO TOKENS");
+                warn("No tokens");
             } else {
-                console.log("GOT THEM TOKENS", tokens);
+                log("GOT THEM TOKENS", tokens);
                 saveTokens(tokens);
                 window.location.replace("/");
             }
@@ -23,7 +23,7 @@ class CallbackPage extends React.Component{
     }
 
     render() {
-        return (<p>Authenticating</p>)
+        return (<p>Authenticating, please wait.</p>)
     }
 }
 
