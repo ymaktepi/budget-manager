@@ -6,7 +6,7 @@ import {
     INDEX_CURRENT_EXPENSES
 } from "../components/constants";
 import {debug, warn} from "./simpleLogger";
-import {ICategoryLog, IExpenseLog} from "./types";
+import {ICategoryFrame, ICategoryLog, IExpenseLog} from "./types";
 import {prependListener} from "cluster";
 
 type ParamsCreateSheet = sheets_v4.Params$Resource$Spreadsheets$Create;
@@ -116,14 +116,14 @@ export const getExpenses = async (sheetsClient: sheets_v4.Sheets, spreadsheetId:
     return values.flatMap(array => ({date: new Date(array[0]), category: String(array[1]), name: String(array[2]), amount: Number(array[3])}));
 };
 
-export const getAllData = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string): Promise<Map<string, [ICategoryLog, IExpenseLog[]]>| undefined> => {
+export const getAllData = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string): Promise<Map<string, ICategoryFrame>| undefined> => {
     const categoriesList = await getCategories(sheetsClient, spreadsheetId);
     if(!categoriesList){
         warn("could not get categories");
         return undefined;
     }
-    const data = new Map<string, [ICategoryLog, IExpenseLog[]]>(
-        categoriesList.map(category => [category.name, [category, []]])
+    const data = new Map<string, ICategoryFrame>(
+        categoriesList.map(category => [category.name, {category, expenses: []}])
     );
 
     const expenses = await getExpenses(sheetsClient, spreadsheetId);
@@ -131,7 +131,7 @@ export const getAllData = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: 
         expenses.forEach(expense => {
             if(data.has(expense.name)){
                 // @ts-ignore
-                data.get(expense.name)[1].push(expense);
+                data.get(expense.name).expenses.push(expense);
             } else {
                 warn("Category not found for expense: ", expense);
             }

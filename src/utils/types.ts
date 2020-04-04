@@ -10,3 +10,8 @@ export interface IExpenseLog {
     name: string;
     amount: number;
 }
+
+export interface ICategoryFrame {
+    category: ICategoryLog;
+    expenses: IExpenseLog[];
+}

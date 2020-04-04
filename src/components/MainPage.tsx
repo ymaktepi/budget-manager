@@ -9,7 +9,7 @@ import {OAuth2Client} from "google-auth-library";
 import Settings from "./main-page/Settings";
 import SettingsIcon from '@material-ui/icons/Settings';
 import {addCategory, addExpense, createSpreadsheet, getAllData} from "../utils/sheetsUtils";
-import {ICategoryLog, IExpenseLog} from "../utils/types";
+import {ICategoryFrame, ICategoryLog, IExpenseLog} from "../utils/types";
 import Category from "./main-page/Category";
 import {warn} from "../utils/simpleLogger";
 import Expenses from "./main-page/Expenses";
@@ -27,7 +27,7 @@ interface IMainPageState {
     client: OAuth2Client;
     spreadsheetId: string | null;
     sheets: sheets_v4.Sheets;
-    data: Map<string, [ICategoryLog, IExpenseLog[]]>;
+    data: Map<string, ICategoryFrame>;
 }
 
 class MainPage extends React.Component<{}, IMainPageState>{
@@ -90,7 +90,7 @@ class MainPage extends React.Component<{}, IMainPageState>{
         if(this.state.spreadsheetId !== null) {
             if (await addCategory(this.state.sheets, this.state.spreadsheetId, category)) {
                 let categories = this.state.data;
-                categories.set(category.name, [category, []]);
+                categories.set(category.name, {category, expenses: []});
                 this.setState({data: categories});
             }
         }
@@ -106,7 +106,7 @@ class MainPage extends React.Component<{}, IMainPageState>{
 
     render() {
         const expensesData = new Map<ICategoryLog, IExpenseLog[]>();
-        const categories = Array.from(this.state.data.values()).map(v => v[0]);
+        const categories = Array.from(this.state.data.values()).map(v => v.category);
         return (
             <div >
                 <AppBar position="static">
