@@ -5,6 +5,10 @@ import {debug} from "./simpleLogger";
 
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file";
 
+// need to renew authentication. tokens are valid 1h.
+// 5 seconds before this hour is passed, auth is triggered again
+const MILLISECONDS_TO_EXPIRACY_RENEW = 5000;
+
 export function getNewClient(): OAuth2Client {
     return new google.auth.OAuth2(
         CLIENT_ID,
@@ -49,7 +53,8 @@ export function getTokensFromStorage(): Credentials | undefined {
         return undefined;
     }
     const now = Date.now();
-    if (credentials.expiry_date > now) {
+    if (credentials.expiry_date > now + MILLISECONDS_TO_EXPIRACY_RENEW) {
+        setTimeout(generateToken, credentials.expiry_date-now-MILLISECONDS_TO_EXPIRACY_RENEW);
         return credentials;
     } else {
         debug(`expiry date: ${now} is not before ${credentials.expiry_date}`);
