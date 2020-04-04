@@ -48,7 +48,7 @@ export function saveTokens(tokens: Credentials) {
     localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(tokens));
 }
 
-export function getTokensFromStorage(): Credentials | undefined {
+function getTokensFromStorage(): Credentials | undefined {
     const tokens = localStorage.getItem(CREDENTIALS_KEY);
     if(tokens === null) {
         debug("No tokens in storage");
