@@ -99,13 +99,17 @@ class MainPage extends React.Component<{}, IMainPageState>{
     private addExpense = async (expenseLog: IExpenseLog) => {
         if(this.state.spreadsheetId !== null) {
             if(await addExpense(this.state.sheets, this.state.spreadsheetId, expenseLog)) {
-
+                let data = this.state.data;
+                if(data.has(expenseLog.category)) {
+                    // @ts-ignore
+                    data.get(expenseLog.category).expenses.push(expenseLog);
+                    this.setState({data});
+                }
             }
         }
     };
 
     render() {
-        const expensesData = new Map<ICategoryLog, IExpenseLog[]>();
         const categories = Array.from(this.state.data.values()).map(v => v.category);
         return (
             <div >
@@ -117,7 +121,7 @@ class MainPage extends React.Component<{}, IMainPageState>{
                     </Tabs>
                 </AppBar>
                 <TabPanel value={this.state.tabIndex} index={CONSTANTS.TAB_INDEXES.EXPENSES}>
-                    <Expenses expensesData={expensesData} addExpense={this.addExpense}/>
+                    <Expenses expensesData={this.state.data} addExpense={this.addExpense}/>
                 </TabPanel>
                 <TabPanel value={this.state.tabIndex} index={CONSTANTS.TAB_INDEXES.CATEGORIES}>
                     <Category categories={categories} addCategory={this.addCategory}/>
