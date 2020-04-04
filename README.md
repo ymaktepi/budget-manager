@@ -1,3 +1,11 @@
+
+## Deploy with docker
+
+- `docker build -f Dockerfile -t budget-manager .`
+- Edit `credentials_example.js`
+- `docker-compose up -d`
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

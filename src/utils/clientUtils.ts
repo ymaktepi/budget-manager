@@ -1,6 +1,6 @@
 import {google} from "googleapis";
 import {Credentials, OAuth2Client} from "google-auth-library";
-import {CLIENT_ID, CLIENT_SECRET, REDIRECT_URL} from "./credentials";
+import {CLIENT_ID, CLIENT_SECRET, REDIRECT_URL} from "../config";
 import {debug} from "./simpleLogger";
 
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file";
