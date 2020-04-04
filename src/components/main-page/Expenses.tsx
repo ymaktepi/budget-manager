@@ -1,4 +1,5 @@
 import React from "react";
+import {Grid} from "@material-ui/core";
 import {ICategoryFrame, IExpenseLog} from "../../utils/types";
 import ExpenseDisplay from "./expenses/ExpenseDisplay";
 
@@ -18,7 +19,9 @@ class Expenses extends React.Component<IExpensesProps, {}> {
                 // @ts-ignore does not recognise that frame cannot be undefined due to previous filter
                 .map(frame => <ExpenseDisplay categoryFrame={frame} key={frame.category.name} />);
         return (
-            <>{listExpensesDisplays}</>
+            <Grid container spacing={3}>
+                {listExpensesDisplays}
+            </Grid>
         );
     }
 }

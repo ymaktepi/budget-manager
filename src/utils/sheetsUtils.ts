@@ -7,7 +7,6 @@ import {
 } from "../components/constants";
 import {debug, warn} from "./simpleLogger";
 import {ICategoryFrame, ICategoryLog, IExpenseLog} from "./types";
-import {prependListener} from "cluster";
 
 type ParamsCreateSheet = sheets_v4.Params$Resource$Spreadsheets$Create;
 type ParamsGetValues = sheets_v4.Params$Resource$Spreadsheets$Values$Get;
@@ -94,6 +93,7 @@ const getPage = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, sh
             }
         }
     );
+
 };
 
 export const getCategories = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string): Promise<ICategoryLog[] | undefined> => {
