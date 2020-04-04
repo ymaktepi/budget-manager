@@ -1,5 +1,8 @@
 import React from "react";
 import {Input} from "@material-ui/core";
+import IconButton from "@material-ui/core/IconButton";
+import { Add as AddIcon} from '@material-ui/icons';
+import "./entry-adder.css";
 
 interface IEntryAdderProps {
     onNewEntry: (name: string, value: number) => void;
@@ -62,7 +65,12 @@ class EntryAdder extends React.Component<IEntryAdderProps, IExpenseAdderState> {
                     onChange={this.handleChangeValue}
                     fullWidth={true}
                 />
-
+                <div className={"align-center"}>
+                    <IconButton aria-label={"Add"} onClick={this.addExpense}
+                    >
+                        <AddIcon style={{color: "green"}} fontSize={"large"} />
+                    </IconButton>
+                </div>
             </>
         );
     };

@@ -29,7 +29,7 @@ class ExpenseDisplay extends React.Component<IExpenseDisplayProps, {}> {
 
     render = () => {
         const frame = this.props.categoryFrame;
-        const amountUsed = frame.expenses.reduce((sum, current) => sum + current.amount, 0);
+        const amountUsed = frame.expenses.reduce((sum, current) => sum + Number(current.amount), 0);
         const listItems = frame.expenses.map(expense => (<li key={expense.name + expense.amount + expense.date.toISOString()}> {expense.name}, {expense.amount}</li>));
         return <Grid item xs={12} sm={6} md={4}>
             <Paper className={"tile"}>
@@ -37,7 +37,7 @@ class ExpenseDisplay extends React.Component<IExpenseDisplayProps, {}> {
                     {frame.category.name}
                 </Typography>
                 <Typography>
-                    {amountUsed}/{frame.category.amount}
+                    {amountUsed.toFixed(2)}/{frame.category.amount.toFixed(2)}
                 </Typography>
                 <ul>
                     {listItems}

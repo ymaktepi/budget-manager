@@ -33,12 +33,12 @@ class Expenses extends React.Component<IExpensesProps, {}> {
                 // @ts-ignore does not recognise that frame cannot be undefined due to previous filter
                 .map(frame => <ExpenseDisplay categoryFrame={frame} key={frame.category.name} onNewExpense={this.props.addExpense} />);
         return (
-            <Grid container spacing={3}>
+            <Grid container spacing={3} alignItems={"baseline"} direction={"row"}>
                 {listExpensesDisplays}
-                <Grid item>
+                <Grid item xs={12} sm={6} md={4}>
                     <Paper className={"tile"}>
                         <Typography variant={"h5"}>
-                            Add new category.
+                            Add new category
                         </Typography>
                         <EntryAdder placeholder={"Category Name"} onNewEntry={this.handleNewCategory}/>
                     </Paper>
