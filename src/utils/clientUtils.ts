@@ -9,6 +9,8 @@ const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googlea
 // 5 seconds before this hour is passed, auth is triggered again
 const MILLISECONDS_TO_EXPIRACY_RENEW = 5000;
 
+const CREDENTIALS_KEY = "credentials";
+
 export function getNewClient(): OAuth2Client {
     return new google.auth.OAuth2(
         CLIENT_ID,
@@ -37,12 +39,17 @@ export function generateToken() {
     window.location.replace(getAuthUrl(getNewClient()));
 }
 
+export function regenerateToken() {
+    localStorage.removeItem(CREDENTIALS_KEY);
+    generateToken()
+}
+
 export function saveTokens(tokens: Credentials) {
-    localStorage.setItem("credentials", JSON.stringify(tokens));
+    localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(tokens));
 }
 
 export function getTokensFromStorage(): Credentials | undefined {
-    const tokens = localStorage.getItem("credentials");
+    const tokens = localStorage.getItem(CREDENTIALS_KEY);
     if(tokens === null) {
         debug("No tokens in storage");
         return undefined;
@@ -54,11 +61,11 @@ export function getTokensFromStorage(): Credentials | undefined {
     }
     const now = Date.now();
     if (credentials.expiry_date > now + MILLISECONDS_TO_EXPIRACY_RENEW) {
-        setTimeout(generateToken, credentials.expiry_date-now-MILLISECONDS_TO_EXPIRACY_RENEW);
+        setTimeout(regenerateToken, credentials.expiry_date-now-MILLISECONDS_TO_EXPIRACY_RENEW);
         return credentials;
     } else {
         debug(`expiry date: ${now} is not before ${credentials.expiry_date}`);
-        localStorage.removeItem("credentials");
+        localStorage.removeItem(CREDENTIALS_KEY);
         return undefined;
     }
 }

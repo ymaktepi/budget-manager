@@ -7,6 +7,7 @@ import {
 } from "../components/constants";
 import {debug, warn} from "./simpleLogger";
 import {ICategoryFrame, ICategoryLog, IExpenseLog} from "./types";
+import moment from "moment";
 
 type ParamsCreateSheet = sheets_v4.Params$Resource$Spreadsheets$Create;
 type ParamsGetValues = sheets_v4.Params$Resource$Spreadsheets$Values$Get;
@@ -56,7 +57,8 @@ export const addCategory = async (sheetsClient: sheets_v4.Sheets, spreadsheetId:
 
 export const addExpense = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, expenseLog: IExpenseLog) => {
     debug("addExpense", expenseLog);
-    const row = [expenseLog.date, expenseLog.category, expenseLog.name, expenseLog.amount];
+    const date: string = moment(expenseLog.date).format();
+    const row = [date, expenseLog.category, expenseLog.name, expenseLog.amount];
     return appendRow(sheetsClient, spreadsheetId, CURRENT_EXPENSES, row);
 };
 
@@ -113,7 +115,11 @@ export const getExpenses = async (sheetsClient: sheets_v4.Sheets, spreadsheetId:
         debug("Expenses are undefined");
         return undefined;
     }
-    return values.flatMap(array => ({date: new Date(array[0]), category: String(array[1]), name: String(array[2]), amount: Number(array[3])}));
+    console.debug(values);
+    return values.flatMap(array => ({
+            date: moment(String(array[0])), category: String(array[1]), name: String(array[2]), amount: Number(array[3])
+        }
+    ));
 };
 
 export const getAllData = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string): Promise<Map<string, ICategoryFrame>| undefined> => {
@@ -129,9 +135,9 @@ export const getAllData = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: 
     const expenses = await getExpenses(sheetsClient, spreadsheetId);
     if(expenses) {
         expenses.forEach(expense => {
-            if(data.has(expense.name)){
+            if(data.has(expense.category)){
                 // @ts-ignore
-                data.get(expense.name).expenses.push(expense);
+                data.get(expense.category).expenses.push(expense);
             } else {
                 warn("Category not found for expense: ", expense);
             }

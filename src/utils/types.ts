@@ -1,3 +1,4 @@
+import {Moment} from "moment";
 
 export interface ICategoryLog {
     name: string;
@@ -5,7 +6,7 @@ export interface ICategoryLog {
 }
 
 export interface IExpenseLog {
-    date: Date;
+    date: Moment;
     category: string;
     name: string;
     amount: number;

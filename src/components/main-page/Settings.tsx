@@ -14,12 +14,15 @@ interface ISettingsState {
 
 class Settings extends React.Component<ISettingsProps, ISettingsState> {
 
-    constructor(props:ISettingsProps) {
+    constructor(props: ISettingsProps) {
         super(props);
-        this.state = {value: this.props.id??""}
+        this.state = {value: this.props.id ?? ""}
     }
 
-    handleChange = (event: any) => {    this.setState({value: event.target.value});  };
+    private handleChange = (event: any) => {
+        this.setState({value: event.target.value});
+    };
+
     private handleKeyPress = (event: any) => {
         if (event.key === "Enter") {
             this.updateId();

@@ -10,15 +10,13 @@ import Settings from "./main-page/Settings";
 import SettingsIcon from '@material-ui/icons/Settings';
 import {addCategory, addExpense, createSpreadsheet, getAllData} from "../utils/sheetsUtils";
 import {ICategoryFrame, ICategoryLog, IExpenseLog} from "../utils/types";
-import Category from "./main-page/Category";
 import {warn} from "../utils/simpleLogger";
-import Expenses from "./main-page/Expenses";
+import Expenses from "./main-page/expenses/Expenses";
 
 const CONSTANTS = {
     TAB_INDEXES: {
         EXPENSES: 0,
-        CATEGORIES: 1,
-        SETTINGS: 2,
+        SETTINGS: 1,
     },
 };
 
@@ -30,6 +28,8 @@ interface IMainPageState {
     data: Map<string, ICategoryFrame>;
 }
 
+const SPREADSHEET_ID = "spreadsheetId";
+
 class MainPage extends React.Component<{}, IMainPageState>{
     constructor(props: {}) {
         super(props);
@@ -38,7 +38,7 @@ class MainPage extends React.Component<{}, IMainPageState>{
             redirectToAuth();
             return;
         }
-        const spreadsheetId = localStorage.getItem("spreadsheetId");
+        const spreadsheetId = localStorage.getItem(SPREADSHEET_ID);
         const sheets = google.sheets({version: "v4", auth: client});
         const data = new Map();
         const tabIndex = spreadsheetId ? CONSTANTS.TAB_INDEXES.EXPENSES : CONSTANTS.TAB_INDEXES.SETTINGS;
@@ -63,7 +63,7 @@ class MainPage extends React.Component<{}, IMainPageState>{
     };
 
     private handleIdChange = async (id: string) => {
-        localStorage.setItem("spreadsheetId", id);
+        localStorage.setItem(SPREADSHEET_ID, id);
         this.setState({spreadsheetId: id});
         this.resetId();
     };
@@ -110,21 +110,16 @@ class MainPage extends React.Component<{}, IMainPageState>{
     };
 
     render() {
-        const categories = Array.from(this.state.data.values()).map(v => v.category);
         return (
             <div >
                 <AppBar position="static">
                     <Tabs value={this.state.tabIndex} onChange={this.handleTabChange} aria-label="simple tabs example">
                         <Tab label="Expenses" disabled={!this.state.spreadsheetId} {...a11yProps(CONSTANTS.TAB_INDEXES.EXPENSES)} />
-                        <Tab label="Categories" disabled={!this.state.spreadsheetId} {...a11yProps(CONSTANTS.TAB_INDEXES.CATEGORIES)} />
                         <Tab icon={<SettingsIcon/>} {...a11yProps(CONSTANTS.TAB_INDEXES.SETTINGS)} />
                     </Tabs>
                 </AppBar>
                 <TabPanel value={this.state.tabIndex} index={CONSTANTS.TAB_INDEXES.EXPENSES}>
-                    <Expenses expensesData={this.state.data} addExpense={this.addExpense}/>
-                </TabPanel>
-                <TabPanel value={this.state.tabIndex} index={CONSTANTS.TAB_INDEXES.CATEGORIES}>
-                    <Category categories={categories} addCategory={this.addCategory}/>
+                    <Expenses expensesData={this.state.data} addExpense={this.addExpense} addCategory={this.addCategory}/>
                 </TabPanel>
                 <TabPanel value={this.state.tabIndex} index={CONSTANTS.TAB_INDEXES.SETTINGS}>
                     <Settings id={this.state.spreadsheetId} onIdChange={this.handleIdChange} createSpreadsheet={this.createSpreadsheet}/>
