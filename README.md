@@ -1,7 +1,6 @@
 
 ## Deploy with docker
 
-- `docker build -f Dockerfile -t budget-manager .`
 - Edit `credentials_example.js`
 - `docker-compose up -d`
 
