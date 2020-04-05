@@ -4,7 +4,7 @@ services:
     image: budget-manager
     build: .
     ports:
-      - "3000:80"
+      - "127.0.0.1:3000:80"
     volumes:
       - "./credentials_example.js:/usr/share/nginx/html/credentials.js"
     restart: always

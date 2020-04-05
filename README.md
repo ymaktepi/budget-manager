@@ -7,6 +7,10 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+To run it locally, you need to:
+- Edit `credentials_example.js`
+- `cp credentials_example.js public/credentials.js`
+
 ## Available Scripts
 
 In the project directory, you can run:
