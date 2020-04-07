@@ -1,4 +1,4 @@
-
+![Build and publish to Github Packages](https://github.com/ymaktepi/budget-manager/workflows/Build%20and%20publish%20to%20Github%20Packages/badge.svg?branch=master)
 ## Deploy with docker
 
 - Edit `credentials_example.js`
