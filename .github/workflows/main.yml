@@ -39,6 +39,9 @@ jobs:
 
     - name: Push changes
       run: |
+          # cannot push without this
+          git config user.email "courgettesmaster@courgettes.club"
+          git config user.name "Courgettes Bot"
           echo $NEW_VERSION > VERSION
           git commit VERSION -m "Bumped VERSION to $NEW_VERSION [ci skip]"
           git push origin master
