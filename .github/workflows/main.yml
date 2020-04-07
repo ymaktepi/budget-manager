@@ -1,0 +1,32 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Build and publish to Github Packages
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+    
+    # Login to Github packages
+    - name: Docker login
+      run: echo ${{secrets.GITHUB_TOKEN}} | docker login docker.pkg.github.com -u ymaktepi --password-stdin
+      
+    # Runs a single command using the runners shell
+    - name: Docker build
+      run: docker build -f $GITHUB_WORKSPACE/Dockerfile -t docker.pkg.github.com/ymaktepi/budget-manager/budget-manager:latest  -t docker.pkg.github.com/ymaktepi/budget-manager/budget-manager:0.1 $GITHUB_WORKSPACE
+    
+    - name: Docker push to GH Packages
+      run: docker push docker.pkg.github.com/ymaktepi/budget-manager/budget-manager:0.1
