@@ -42,7 +42,7 @@ class EntryAdder extends React.Component<IEntryAdderProps, IExpenseAdderState> {
 
     private addExpense = () => {
         if (this.state.value && this.state.name && this.state.name !== "") {
-            this.props.onNewEntry(this.state.name, this.state.value);
+            this.props.onNewEntry(this.state.name, Number(this.state.value));
         }
     };
 
