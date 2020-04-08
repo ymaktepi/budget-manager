@@ -35,7 +35,9 @@ jobs:
       run: docker build -f $GITHUB_WORKSPACE/Dockerfile -t docker.pkg.github.com/ymaktepi/budget-manager/budget-manager:latest  -t docker.pkg.github.com/ymaktepi/budget-manager/budget-manager:${VERSION} $GITHUB_WORKSPACE
     
     - name: Docker push to GH Packages
-      run: docker push docker.pkg.github.com/ymaktepi/budget-manager/budget-manager:$VERSION
+      run:  |
+          docker push docker.pkg.github.com/ymaktepi/budget-manager/budget-manager:$VERSION
+          docker push docker.pkg.github.com/ymaktepi/budget-manager/budget-manager:latest
 
     - name: Push changes
       run: |
