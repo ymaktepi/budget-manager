@@ -12,6 +12,8 @@ import {addCategory, addExpense, createSpreadsheet, getAllData} from "../utils/s
 import {ICategoryFrame, ICategoryLog, IExpenseLog} from "../utils/types";
 import {warn} from "../utils/simpleLogger";
 import Expenses from "./main-page/expenses/Expenses";
+import {Snackbar} from '@material-ui/core';
+import {Alert as MuiAlert} from '@material-ui/lab';
 
 const CONSTANTS = {
     TAB_INDEXES: {
@@ -20,12 +22,23 @@ const CONSTANTS = {
     },
 };
 
+function Alert(props: any) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
+interface IToastState {
+    open: boolean;
+    message: string;
+    severity: string;
+}
+
 interface IMainPageState {
     tabIndex: number;
     client: OAuth2Client;
     spreadsheetId: string | null;
     sheets: sheets_v4.Sheets;
     data: Map<string, ICategoryFrame>;
+    toastState: IToastState;
 }
 
 const SPREADSHEET_ID = "spreadsheetId";
@@ -42,12 +55,17 @@ class MainPage extends React.Component<{}, IMainPageState> {
         const sheets = google.sheets({version: "v4", auth: client});
         const data = new Map();
         const tabIndex = spreadsheetId ? CONSTANTS.TAB_INDEXES.EXPENSES : CONSTANTS.TAB_INDEXES.SETTINGS;
-        this.state = {tabIndex: tabIndex, client, spreadsheetId, sheets, data};
+        const toastState: IToastState = {
+            open: false,
+            message: "",
+            severity: "error",
+        };
+        this.state = {tabIndex, client, spreadsheetId, sheets, data, toastState};
     }
 
-    async componentDidMount() {
+    componentDidMount = async () => {
         this.resetId();
-    }
+    };
 
     private resetId = async () => {
         if (this.state.spreadsheetId !== null) {
@@ -68,6 +86,26 @@ class MainPage extends React.Component<{}, IMainPageState> {
         this.resetId();
     };
 
+    private handleSnackbarClose = (_: any, reason: string) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        let {toastState} = this.state;
+        toastState.open = false;
+
+        this.setState({toastState});
+    };
+
+    private showWarningToast = (message: string) => {
+        const toastState = {
+            open: true,
+            message,
+            severity: "warning",
+        };
+
+        this.setState({toastState});
+    };
+
     private createSpreadsheet = async () => {
         const id = await createSpreadsheet(this.state.sheets);
         if (id) {
@@ -77,13 +115,16 @@ class MainPage extends React.Component<{}, IMainPageState> {
 
     private addCategory = async (category: ICategoryLog) => {
         if (category.name === "") {
-            warn("Category already present");
+            const message = "Category empty";
+            warn(message);
             return;
         }
         const categories = Array.from(this.state.data.keys());
         const index = categories.indexOf(category.name);
         if (index >= 0) {
-            warn("Category already present");
+            const message = "Category already present";
+            warn(message);
+            this.showWarningToast(message);
             return;
         }
 
@@ -93,6 +134,8 @@ class MainPage extends React.Component<{}, IMainPageState> {
                 categories.set(category.name, {category, expenses: []});
                 this.setState({data: categories});
             }
+        } else {
+            this.showWarningToast("Spreadsheet ID not set in settings.");
         }
     };
 
@@ -106,6 +149,8 @@ class MainPage extends React.Component<{}, IMainPageState> {
                     this.setState({data});
                 }
             }
+        } else {
+            this.showWarningToast("Spreadsheet ID not set in settings.");
         }
     };
 
@@ -119,6 +164,11 @@ class MainPage extends React.Component<{}, IMainPageState> {
                         <Tab icon={<SettingsIcon/>} {...a11yProps(CONSTANTS.TAB_INDEXES.SETTINGS)} />
                     </Tabs>
                 </AppBar>
+                <Snackbar open={this.state.toastState.open} autoHideDuration={5000} onClose={this.handleSnackbarClose}>
+                    <Alert onClose={this.handleSnackbarClose} severity={this.state.toastState.severity}>
+                        {this.state.toastState.message}
+                    </Alert>
+                </Snackbar>
                 <TabPanel value={this.state.tabIndex} index={CONSTANTS.TAB_INDEXES.EXPENSES}>
                     <Expenses expensesData={this.state.data} addExpense={this.addExpense}
                               addCategory={this.addCategory}/>
