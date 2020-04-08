@@ -133,6 +133,8 @@ class MainPage extends React.Component<{}, IMainPageState> {
                 let categories = this.state.data;
                 categories.set(category.name, {category, expenses: []});
                 this.setState({data: categories});
+            } else {
+                this.showWarningToast("Could not add category, probably a network issue.");
             }
         } else {
             this.showWarningToast("Spreadsheet ID not set in settings.");
@@ -148,6 +150,8 @@ class MainPage extends React.Component<{}, IMainPageState> {
                     data.get(expenseLog.category).expenses.push(expenseLog);
                     this.setState({data});
                 }
+            } else {
+                this.showWarningToast("Could not add expense, probably a network issue.");
             }
         } else {
             this.showWarningToast("Spreadsheet ID not set in settings.");
