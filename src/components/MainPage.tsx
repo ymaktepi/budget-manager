@@ -1,7 +1,7 @@
 import React from "react";
 import {getClientFromStorage, redirectToAuth} from "../utils/clientUtils";
 import {google, sheets_v4} from "googleapis";
-import {Tab} from "@material-ui/core";
+import {CircularProgress, LinearProgress, Tab} from "@material-ui/core";
 import Tabs from "@material-ui/core/Tabs";
 import AppBar from "@material-ui/core/AppBar";
 import {a11yProps, TabPanel} from "./tabUtils";
@@ -39,6 +39,7 @@ interface IMainPageState {
     sheets: sheets_v4.Sheets;
     data: Map<string, ICategoryFrame>;
     toastState: IToastState;
+    loading: boolean;
 }
 
 const SPREADSHEET_ID = "spreadsheetId";
@@ -60,7 +61,7 @@ class MainPage extends React.Component<{}, IMainPageState> {
             message: "",
             severity: "error",
         };
-        this.state = {tabIndex, client, spreadsheetId, sheets, data, toastState};
+        this.state = {tabIndex, client, spreadsheetId, sheets, data, toastState, loading: false};
     }
 
     componentDidMount = async () => {
@@ -69,10 +70,14 @@ class MainPage extends React.Component<{}, IMainPageState> {
 
     private resetId = async () => {
         if (this.state.spreadsheetId !== null) {
+            this.setLoading(true);
             const data = await getAllData(this.state.sheets, this.state.spreadsheetId);
             if (data) {
                 this.setState({data});
+            } else {
+                this.showWarningToast("Could not get data from spreadsheet, probably a network issue");
             }
+            this.setLoading(false);
         }
     };
 
@@ -106,11 +111,20 @@ class MainPage extends React.Component<{}, IMainPageState> {
         this.setState({toastState});
     };
 
+    private setLoading = (loading: boolean) => {
+        this.setState({loading});
+    };
+
     private createSpreadsheet = async () => {
+        this.setLoading(true);
         const id = await createSpreadsheet(this.state.sheets);
         if (id) {
             this.setState({spreadsheetId: id});
         }
+        else {
+            this.showWarningToast("Could not create spreadsheet, probably a network issue.");
+        }
+        this.setLoading(false);
     };
 
     private addCategory = async (category: ICategoryLog) => {
@@ -129,6 +143,7 @@ class MainPage extends React.Component<{}, IMainPageState> {
         }
 
         if (this.state.spreadsheetId !== null) {
+            this.setLoading(true);
             if (await addCategory(this.state.sheets, this.state.spreadsheetId, category)) {
                 let categories = this.state.data;
                 categories.set(category.name, {category, expenses: []});
@@ -136,6 +151,7 @@ class MainPage extends React.Component<{}, IMainPageState> {
             } else {
                 this.showWarningToast("Could not add category, probably a network issue.");
             }
+            this.setLoading(false);
         } else {
             this.showWarningToast("Spreadsheet ID not set in settings.");
         }
@@ -143,6 +159,7 @@ class MainPage extends React.Component<{}, IMainPageState> {
 
     private addExpense = async (expenseLog: IExpenseLog) => {
         if (this.state.spreadsheetId !== null) {
+            this.setLoading(true);
             if (await addExpense(this.state.sheets, this.state.spreadsheetId, expenseLog)) {
                 let data = this.state.data;
                 if (data.has(expenseLog.category)) {
@@ -153,6 +170,7 @@ class MainPage extends React.Component<{}, IMainPageState> {
             } else {
                 this.showWarningToast("Could not add expense, probably a network issue.");
             }
+            this.setLoading(false);
         } else {
             this.showWarningToast("Spreadsheet ID not set in settings.");
         }
@@ -168,6 +186,9 @@ class MainPage extends React.Component<{}, IMainPageState> {
                         <Tab icon={<SettingsIcon/>} {...a11yProps(CONSTANTS.TAB_INDEXES.SETTINGS)} />
                     </Tabs>
                 </AppBar>
+                {this.state.loading &&
+                <LinearProgress/>
+                }
                 <Snackbar open={this.state.toastState.open} autoHideDuration={5000} onClose={this.handleSnackbarClose}>
                     <Alert onClose={this.handleSnackbarClose} severity={this.state.toastState.severity}>
                         {this.state.toastState.message}
