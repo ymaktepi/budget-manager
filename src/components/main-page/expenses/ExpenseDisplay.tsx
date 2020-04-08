@@ -1,5 +1,5 @@
 import React from "react";
-import {Grid} from "@material-ui/core";
+import {Box, Grid, LinearProgress} from "@material-ui/core";
 import {ICategoryFrame, IExpenseLog} from "../../../utils/types";
 import Paper from "@material-ui/core/Paper";
 import {Typography} from '@material-ui/core';
@@ -37,17 +37,32 @@ class ExpenseDisplay extends React.Component<IExpenseDisplayProps, {}> {
                 <Grid item xs={8}>{expense.name}</Grid>
             </React.Fragment>
         ));
+        const percentUsed = Math.round(Math.min(100, amountUsed / frame.category.amount * 100));
+        const color = percentUsed >= 99 ? "secondary" : "primary";
         return <Grid item xs={12} sm={6} md={4}>
             <Paper className={"tile"}>
-                <Typography variant={"h5"}>
-                    {frame.category.name}
-                </Typography>
-                <Typography>
-                    {amountUsed.toFixed(2)}/{frame.category.amount.toFixed(2)}
-                </Typography>
+                <Box display={"flex"} flexDirection={"row"} className={"bottom-margin"}>
+                    <Box display={"flex"} flexDirection={"column"} className={"title-ratio"} justifyContent={"center"}>
+                        <Typography className={"text-centered"}>
+                            {Math.round(amountUsed)}
+                            <div className={"divider div-transparent"}/>
+                        </Typography>
+                        <Typography className={"text-centered"}>
+                            {Math.round(frame.category.amount)}
+                        </Typography>
+                    </Box>
+                    <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
+                    <Typography variant={"h5"}>
+                        {frame.category.name}
+                    </Typography>
+                    </Box>
+                </Box>
+                <LinearProgress variant={"determinate"} value={percentUsed} color={color}/>
+                <div className={"bottom-margin"}/>
                 <Grid container>
                     {listItems}
                 </Grid>
+                <div className={"bottom-margin"}/>
                 <EntryAdder placeholder={"Expense Name"} onNewEntry={this.handleNewEntry}/>
             </Paper>
         </Grid>

@@ -2,3 +2,34 @@
 .tile {
     padding: 10px;
 }
+
+.bottom-margin {
+    margin-bottom: 10px;
+}
+
+.divider
+{
+    position: relative;
+    height: 1px;
+}
+
+.text-centered {
+    text-align: center;
+}
+
+.title-ratio {
+    margin-left: 5px;
+    margin-right: 15px;
+}
+
+.div-transparent:before
+{
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 5%;
+    right: 5%;
+    width: 90%;
+    height: 1px;
+    background-image: linear-gradient(to right, transparent, rgb(48,49,51), transparent);
+}
