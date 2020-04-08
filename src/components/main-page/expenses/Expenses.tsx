@@ -38,9 +38,11 @@ class Expenses extends React.Component<IExpensesProps, {}> {
                 {listExpensesDisplays}
                 <Grid item xs={12} sm={6} md={4}>
                     <Paper className={"tile"}>
+                        <div className={"bottom-margin"}>
                         <Typography variant={"h5"}>
                             Add new category
                         </Typography>
+                            </div>
                         <EntryAdder placeholder={"Category Name"} onNewEntry={this.handleNewCategory}/>
                     </Paper>
                 </Grid>
