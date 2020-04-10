@@ -45,8 +45,8 @@ class ExpenseDisplay extends React.Component<IExpenseDisplayProps, {}> {
                     <Box display={"flex"} flexDirection={"column"} className={"title-ratio"} justifyContent={"center"}>
                         <Typography className={"text-centered"}>
                             {Math.round(amountUsed)}
-                            <div className={"divider div-transparent"}/>
                         </Typography>
+                        <div className={"divider div-transparent"}/>
                         <Typography className={"text-centered"}>
                             {Math.round(frame.category.amount)}
                         </Typography>
