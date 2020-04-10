@@ -19,6 +19,16 @@ export function getNewClient(): OAuth2Client {
     );
 }
 
+export function getClientFromStorageOrRedirect(): OAuth2Client {
+    const client = getClientFromStorage();
+    if (client === undefined) {
+        redirectToAuth();
+        // @ts-ignore redirect happens before anything is returned
+        return;
+    }
+    return client;
+}
+
 export function getClientFromStorage(): OAuth2Client | undefined {
     let client = getNewClient();
     const credentials = getTokensFromStorage();

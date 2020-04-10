@@ -2,22 +2,32 @@ import React from "react";
 import {Grid, Input, Typography} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
+import {OAuth2Client} from "google-auth-library";
+import {google, sheets_v4} from "googleapis";
+import {getClientFromStorageOrRedirect} from "../../utils/clientUtils";
+import {createSpreadsheet} from "../../utils/sheetsUtils";
+import {SPREADSHEET_ID} from "../constants";
 
 interface ISettingsProps {
-    id: string | null;
-    onIdChange: (id: string) => void;
-    createSpreadsheet: () => void;
+    // onIdChange: (id: string) => void;
+    // createSpreadsheet: () => void;
 }
 
 interface ISettingsState {
     value: string;
+    spreadsheetId: string | null;
+    client: OAuth2Client;
+    sheets: sheets_v4.Sheets;
 }
 
 class Settings extends React.Component<ISettingsProps, ISettingsState> {
 
     constructor(props: ISettingsProps) {
         super(props);
-        this.state = {value: ""}
+        const spreadsheetId = localStorage.getItem(SPREADSHEET_ID);
+        const client = getClientFromStorageOrRedirect();
+        const sheets = google.sheets({version: "v4", auth: client});
+        this.state = {value: "", client, sheets, spreadsheetId};
     }
 
     private handleChange = (event: any) => {
@@ -32,8 +42,20 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
 
     private updateId = () => {
         if (this.state.value !== "") {
-            this.props.onIdChange(this.state.value);
+            localStorage.setItem(SPREADSHEET_ID, this.state.value);
+            this.setState({spreadsheetId: this.state.value});
         }
+    };
+
+    private createSpreadsheet = async () => {
+        const id = await createSpreadsheet(this.state.sheets);
+        if (id) {
+            this.setState({spreadsheetId: id});
+        }
+        else {
+            //this.showWarningToast("Could not create spreadsheet, probably a network issue.");
+        }
+        //this.setLoading(false);
     };
 
     render = () => {
@@ -49,7 +71,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             spreadsheet.<br/>
                             This spreadsheet will be all yours, saved as a private Google Sheet on your account.
                         </Typography>
-                        <Button onClick={this.props.createSpreadsheet} variant={"outlined"} fullWidth>
+                        <Button onClick={this.createSpreadsheet} variant={"outlined"} fullWidth>
                             Create spreadsheet
                         </Button>
                     </Paper>
@@ -75,7 +97,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                         </Button>
                         <Typography variant={"body1"}>
                             Current spreadsheetID: <br/>
-                            {this.props.id}
+                            {this.state.spreadsheetId}
                         </Typography>
                     </Paper>
                 </Grid>
