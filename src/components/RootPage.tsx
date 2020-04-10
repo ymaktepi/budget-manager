@@ -5,12 +5,12 @@ import {
     Route,
     Link,
 } from "react-router-dom";
-import AuthorizationPage from "./AuthorizationPage";
-import CallbackPage from "./CallbackPage";
-import MainPage from "./MainPage";
+import AuthorizationPage from "./secondary/AuthorizationPage";
+import CallbackPage from "./secondary/CallbackPage";
+import MainPage from "./main-page/MainPage";
 import {LinearProgress, Snackbar, Tab, Tabs} from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
-import Settings from "./main-page/Settings";
+import Settings from "./settings/Settings";
 import {a11yProps, TabPanel} from "./tabUtils";
 import {Settings as SettingsIcon} from "@material-ui/icons";
 import {Alert as MuiAlert} from "@material-ui/lab";
@@ -81,7 +81,7 @@ class RootPage extends React.Component<{}, IRootPageState> {
         this.setState({loading});
     };
 
-    render() {
+    render = () => {
         return (
             <Router>
                 <Route
@@ -106,7 +106,8 @@ class RootPage extends React.Component<{}, IRootPageState> {
                                 {this.state.loading &&
                                 <LinearProgress/>
                                 }
-                                <Snackbar open={this.state.toastState.open} autoHideDuration={5000} onClose={this.handleSnackbarClose}>
+                                <Snackbar open={this.state.toastState.open} autoHideDuration={5000}
+                                          onClose={this.handleSnackbarClose}>
                                     <Alert onClose={this.handleSnackbarClose} severity={this.state.toastState.severity}>
                                         {this.state.toastState.message}
                                     </Alert>
@@ -115,7 +116,8 @@ class RootPage extends React.Component<{}, IRootPageState> {
                                     <Route exact path={"/"}>
                                         <TabPanel index={CONSTANTS.TAB_INDEXES.EXPENSES}
                                                   value={selectedTab}>
-                                            <MainPage setLoading={this.setLoading} showWarningToast={this.showWarningToast}/>
+                                            <MainPage setLoading={this.setLoading}
+                                                      showWarningToast={this.showWarningToast}/>
                                         </TabPanel>
                                     </Route>
                                     <Route path={"/settings"}>
@@ -143,8 +145,7 @@ class RootPage extends React.Component<{}, IRootPageState> {
                 />
             </Router>
         );
-    }
-
+    };
 }
 
 export default RootPage;

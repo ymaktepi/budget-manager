@@ -1,10 +1,12 @@
 import React from "react";
-import {Grid, Typography} from "@material-ui/core";
+import {Typography} from "@material-ui/core";
 import {ICategoryFrame, ICategoryLog, IExpenseLog} from "../../../utils/types";
-import ExpenseDisplay from "./ExpenseDisplay";
-import EntryAdder from "../common/EntryAdder";
-import Paper from "@material-ui/core/Paper";
+import ExpensesDisplay from "./ExpensesDisplay";
+import EntryAdder from "../../common/EntryAdder";
 import './expenses.css';
+import {MainContainer} from "../../common/MainContainer";
+import {CardWithTitle} from "../../common/Card";
+import ExpensesSummary from "./ExpensesSummary";
 
 interface IExpensesProps {
     expensesData: Map<string, ICategoryFrame>;
@@ -13,8 +15,6 @@ interface IExpensesProps {
 }
 
 class Expenses extends React.Component<IExpensesProps, {}> {
-
-
     private handleNewCategory = (name: string, value: number) => {
         if (value && name && name !== "") {
             const category: ICategoryLog = {
@@ -24,29 +24,30 @@ class Expenses extends React.Component<IExpensesProps, {}> {
             this.props.addCategory(category);
         }
     };
+
     public render = () => {
-        const listExpensesDisplays =
+        // @ts-ignore does not recognise that content cannot be undefined due to filter
+        const categoryFrames: ICategoryFrame[] =
             Array.from(this.props.expensesData.keys())
                 .sort()
                 .map(sortedName => this.props.expensesData.get(sortedName))
-                .filter(frame => frame !== undefined)
-                // @ts-ignore does not recognise that frame cannot be undefined due to previous filter
-                .map(frame => <ExpenseDisplay categoryFrame={frame} key={frame.category.name}
-                                              onNewExpense={this.props.addExpense}/>);
+                .filter(frame => frame !== undefined);
+
+        const listExpensesDisplays =
+            categoryFrames.map(frame => <ExpensesDisplay categoryFrame={frame} key={frame.category.name}
+                                                         onNewExpense={this.props.addExpense}/>);
         return (
-            <Grid container spacing={3} alignItems={"baseline"} direction={"row"}>
-                {listExpensesDisplays}
-                <Grid item xs={12} sm={6} md={4}>
-                    <Paper className={"tile"}>
-                        <div className={"bottom-margin"}>
-                        <Typography variant={"h5"}>
-                            Add new category
-                        </Typography>
-                            </div>
+            <>
+                <MainContainer>
+                    <ExpensesSummary categoryFrames={categoryFrames}/>
+                    <CardWithTitle title={"Add a new category"}>
                         <EntryAdder placeholder={"Category Name"} onNewEntry={this.handleNewCategory}/>
-                    </Paper>
-                </Grid>
-            </Grid>
+                    </CardWithTitle>
+                </MainContainer>
+                <MainContainer>
+                    {listExpensesDisplays}
+                </MainContainer>
+            </>
         );
     }
 }

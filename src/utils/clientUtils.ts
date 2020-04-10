@@ -11,15 +11,15 @@ const MILLISECONDS_TO_EXPIRACY_RENEW = 5000;
 
 const CREDENTIALS_KEY = "credentials";
 
-export function getNewClient(): OAuth2Client {
+export const getNewClient = (): OAuth2Client => {
     return new google.auth.OAuth2(
         CLIENT_ID,
         CLIENT_SECRET,
         REDIRECT_URL,
     );
-}
+};
 
-export function getClientFromStorageOrRedirect(): OAuth2Client {
+export const getClientFromStorageOrRedirect = (): OAuth2Client => {
     const client = getClientFromStorage();
     if (client === undefined) {
         redirectToAuth();
@@ -27,9 +27,9 @@ export function getClientFromStorageOrRedirect(): OAuth2Client {
         return;
     }
     return client;
-}
+};
 
-export function getClientFromStorage(): OAuth2Client | undefined {
+export const getClientFromStorage = (): OAuth2Client | undefined => {
     let client = getNewClient();
     const credentials = getTokensFromStorage();
     if (!credentials) {
@@ -37,29 +37,29 @@ export function getClientFromStorage(): OAuth2Client | undefined {
     }
     client.setCredentials(credentials);
     return client;
-}
+};
 
-export function getAuthUrl(client: OAuth2Client) {
+export const getAuthUrl = (client: OAuth2Client) => {
     return client.generateAuthUrl({
         scope: SCOPES,
     });
-}
+};
 
-export function generateToken() {
+export const generateToken = () => {
     window.location.replace(getAuthUrl(getNewClient()));
-}
+};
 
-export function regenerateToken() {
+export const regenerateToken = () => {
     localStorage.removeItem(CREDENTIALS_KEY);
     generateToken()
-}
+};
 
-export function saveTokens(tokens: Credentials) {
+export const saveTokens = (tokens: Credentials) => {
     debug("Saving tokens");
     localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(tokens));
-}
+};
 
-function getTokensFromStorage(): Credentials | undefined {
+const getTokensFromStorage = (): Credentials | undefined => {
     const tokens = localStorage.getItem(CREDENTIALS_KEY);
     if (tokens === null) {
         debug("No tokens in storage");
@@ -80,8 +80,8 @@ function getTokensFromStorage(): Credentials | undefined {
         localStorage.removeItem(CREDENTIALS_KEY);
         return undefined;
     }
-}
+};
 
-export function redirectToAuth() {
+export const redirectToAuth = () => {
     window.location.replace("/auth");
-}
+};
