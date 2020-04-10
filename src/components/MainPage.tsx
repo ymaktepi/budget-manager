@@ -1,19 +1,20 @@
 import React from "react";
-import {getClientFromStorage, redirectToAuth} from "../utils/clientUtils";
+import {getClientFromStorageOrRedirect} from "../utils/clientUtils";
 import {google, sheets_v4} from "googleapis";
-import {CircularProgress, LinearProgress, Tab} from "@material-ui/core";
+import {LinearProgress, Tab} from "@material-ui/core";
 import Tabs from "@material-ui/core/Tabs";
 import AppBar from "@material-ui/core/AppBar";
 import {a11yProps, TabPanel} from "./tabUtils";
 import {OAuth2Client} from "google-auth-library";
 import Settings from "./main-page/Settings";
 import SettingsIcon from '@material-ui/icons/Settings';
-import {addCategory, addExpense, createSpreadsheet, getAllData} from "../utils/sheetsUtils";
+import {addCategory, addExpense,getAllData} from "../utils/sheetsUtils";
 import {ICategoryFrame, ICategoryLog, IExpenseLog} from "../utils/types";
 import {warn} from "../utils/simpleLogger";
 import Expenses from "./main-page/expenses/Expenses";
 import {Snackbar} from '@material-ui/core';
 import {Alert as MuiAlert} from '@material-ui/lab';
+import {SPREADSHEET_ID} from "./constants";
 
 const CONSTANTS = {
     TAB_INDEXES: {
@@ -42,16 +43,11 @@ interface IMainPageState {
     loading: boolean;
 }
 
-const SPREADSHEET_ID = "spreadsheetId";
 
 class MainPage extends React.Component<{}, IMainPageState> {
     constructor(props: {}) {
         super(props);
-        const client = getClientFromStorage();
-        if (client === undefined) {
-            redirectToAuth();
-            return;
-        }
+        const client = getClientFromStorageOrRedirect();
         const spreadsheetId = localStorage.getItem(SPREADSHEET_ID);
         const sheets = google.sheets({version: "v4", auth: client});
         const data = new Map();
@@ -85,12 +81,6 @@ class MainPage extends React.Component<{}, IMainPageState> {
         this.setState({tabIndex: newValue});
     };
 
-    private handleIdChange = async (id: string) => {
-        localStorage.setItem(SPREADSHEET_ID, id);
-        this.setState({spreadsheetId: id});
-        this.resetId();
-    };
-
     private handleSnackbarClose = (_: any, reason: string) => {
         if (reason === 'clickaway') {
             return;
@@ -115,17 +105,6 @@ class MainPage extends React.Component<{}, IMainPageState> {
         this.setState({loading});
     };
 
-    private createSpreadsheet = async () => {
-        this.setLoading(true);
-        const id = await createSpreadsheet(this.state.sheets);
-        if (id) {
-            this.setState({spreadsheetId: id});
-        }
-        else {
-            this.showWarningToast("Could not create spreadsheet, probably a network issue.");
-        }
-        this.setLoading(false);
-    };
 
     private addCategory = async (category: ICategoryLog) => {
         if (category.name === "") {
@@ -199,8 +178,7 @@ class MainPage extends React.Component<{}, IMainPageState> {
                               addCategory={this.addCategory}/>
                 </TabPanel>
                 <TabPanel value={this.state.tabIndex} index={CONSTANTS.TAB_INDEXES.SETTINGS}>
-                    <Settings id={this.state.spreadsheetId} onIdChange={this.handleIdChange}
-                              createSpreadsheet={this.createSpreadsheet}/>
+                    <Settings/>
                 </TabPanel>
             </div>
         );
