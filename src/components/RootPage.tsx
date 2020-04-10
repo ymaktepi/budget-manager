@@ -81,7 +81,7 @@ class RootPage extends React.Component<{}, IRootPageState> {
         this.setState({loading});
     };
 
-    render() {
+    render = () => {
         return (
             <Router>
                 <Route
@@ -106,7 +106,8 @@ class RootPage extends React.Component<{}, IRootPageState> {
                                 {this.state.loading &&
                                 <LinearProgress/>
                                 }
-                                <Snackbar open={this.state.toastState.open} autoHideDuration={5000} onClose={this.handleSnackbarClose}>
+                                <Snackbar open={this.state.toastState.open} autoHideDuration={5000}
+                                          onClose={this.handleSnackbarClose}>
                                     <Alert onClose={this.handleSnackbarClose} severity={this.state.toastState.severity}>
                                         {this.state.toastState.message}
                                     </Alert>
@@ -115,7 +116,8 @@ class RootPage extends React.Component<{}, IRootPageState> {
                                     <Route exact path={"/"}>
                                         <TabPanel index={CONSTANTS.TAB_INDEXES.EXPENSES}
                                                   value={selectedTab}>
-                                            <MainPage setLoading={this.setLoading} showWarningToast={this.showWarningToast}/>
+                                            <MainPage setLoading={this.setLoading}
+                                                      showWarningToast={this.showWarningToast}/>
                                         </TabPanel>
                                     </Route>
                                     <Route path={"/settings"}>
@@ -143,8 +145,7 @@ class RootPage extends React.Component<{}, IRootPageState> {
                 />
             </Router>
         );
-    }
-
+    };
 }
 
 export default RootPage;

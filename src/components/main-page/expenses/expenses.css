@@ -1,9 +1,4 @@
-.bottom-margin {
-    margin-bottom: 10px;
-}
-
-.divider
-{
+.divider {
     position: relative;
     height: 1px;
 }
@@ -17,8 +12,7 @@
     margin-right: 15px;
 }
 
-.div-transparent:before
-{
+.div-transparent:before {
     content: "";
     position: absolute;
     top: 0;
@@ -26,5 +20,5 @@
     right: 5%;
     width: 90%;
     height: 1px;
-    background-image: linear-gradient(to right, transparent, rgb(48,49,51), transparent);
+    background-image: linear-gradient(to right, transparent, rgb(48, 49, 51), transparent);
 }

@@ -6,6 +6,7 @@ import EntryAdder from "../../common/EntryAdder";
 import './expenses.css';
 import {MainContainer} from "../../common/MainContainer";
 import {MainItem} from "../../common/MainItem";
+import ExpensesSummary from "./ExpensesSummary";
 
 interface IExpensesProps {
     expensesData: Map<string, ICategoryFrame>;
@@ -14,8 +15,6 @@ interface IExpensesProps {
 }
 
 class Expenses extends React.Component<IExpensesProps, {}> {
-
-
     private handleNewCategory = (name: string, value: number) => {
         if (value && name && name !== "") {
             const category: ICategoryLog = {
@@ -25,6 +24,7 @@ class Expenses extends React.Component<IExpensesProps, {}> {
             this.props.addCategory(category);
         }
     };
+
     public render = () => {
         const listExpensesDisplays =
             Array.from(this.props.expensesData.keys())
@@ -35,17 +35,17 @@ class Expenses extends React.Component<IExpensesProps, {}> {
                 .map(frame => <ExpenseDisplay categoryFrame={frame} key={frame.category.name}
                                               onNewExpense={this.props.addExpense}/>);
         return (
-            <MainContainer>
-                {listExpensesDisplays}
-                <MainItem>
-                    <div className={"bottom-margin"}>
-                        <Typography variant={"h5"}>
-                            Add new category
-                        </Typography>
-                    </div>
-                    <EntryAdder placeholder={"Category Name"} onNewEntry={this.handleNewCategory}/>
-                </MainItem>
-            </MainContainer>
+            <>
+                <MainContainer>
+                    <ExpensesSummary/>
+                    <MainItem title={"Add a new category"}>
+                        <EntryAdder placeholder={"Category Name"} onNewEntry={this.handleNewCategory}/>
+                    </MainItem>
+                </MainContainer>
+                <MainContainer>
+                    {listExpensesDisplays}
+                </MainContainer>
+            </>
         );
     }
 }

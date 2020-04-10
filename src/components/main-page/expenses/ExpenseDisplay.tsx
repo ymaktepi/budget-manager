@@ -52,9 +52,9 @@ class ExpenseDisplay extends React.Component<IExpenseDisplayProps, {}> {
                         </Typography>
                     </Box>
                     <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
-                    <Typography variant={"h5"}>
-                        {frame.category.name}
-                    </Typography>
+                        <Typography variant={"h5"}>
+                            {frame.category.name}
+                        </Typography>
                     </Box>
                 </Box>
                 <LinearProgress variant={"determinate"} value={percentUsed} color={color}/>

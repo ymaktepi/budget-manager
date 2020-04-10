@@ -4,7 +4,7 @@ import {log, warn} from "../../utils/simpleLogger";
 
 
 class CallbackPage extends React.Component {
-    componentDidMount(): void {
+    componentDidMount = () => {
         const url = new URL(window.location.href);
         const code = url.searchParams.get("code");
         if (!code) {
@@ -20,11 +20,11 @@ class CallbackPage extends React.Component {
                 window.location.replace("/");
             }
         });
-    }
+    };
 
-    render() {
+    render = () => {
         return (<p>Authenticating, please wait.</p>)
-    }
+    };
 }
 
 export default CallbackPage;

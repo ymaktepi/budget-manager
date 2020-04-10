@@ -57,10 +57,7 @@ class Settings extends React.Component<{}, ISettingsState> {
     render = () => {
         return (
             <MainContainer>
-                <MainItem>
-                    <Typography variant={"h5"}>
-                        Create a new spreadsheet
-                    </Typography>
+                <MainItem title={"Create a new spreadsheet"}>
                     <Typography variant={"body1"}>
                         If you've never used this application, the first thing you need to do is to create a
                         spreadsheet.<br/>
@@ -70,10 +67,7 @@ class Settings extends React.Component<{}, ISettingsState> {
                         Create spreadsheet
                     </Button>
                 </MainItem>
-                <MainItem>
-                    <Typography variant={"h5"}>
-                        Use an existing spreadsheet
-                    </Typography>
+                <MainItem title={"Use an existing spreadsheet"}>
                     <Typography variant={"body1"}>
                         If you've already used this application but are using it from a new device, you can use an
                         existing

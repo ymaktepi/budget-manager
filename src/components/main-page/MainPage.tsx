@@ -97,13 +97,12 @@ class MainPage extends React.Component<IMainPageProps, IMainPageState> {
         }
     };
 
-    render() {
+    render = () => {
         return (
             <Expenses expensesData={this.state.data} addExpense={this.addExpense}
                       addCategory={this.addCategory}/>
         );
-    }
-
+    };
 }
 
 export default MainPage;
