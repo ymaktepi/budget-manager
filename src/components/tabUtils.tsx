@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import Box from "@material-ui/core/Box";
 
+
 export const TabPanel = (props: any) => {
     const {children, value, index, ...other} = props;
 
@@ -15,7 +16,7 @@ export const TabPanel = (props: any) => {
             aria-labelledby={`simple-tab-${index}`}
             {...other}
         >
-            {value === index && <Box p={3}>{children}</Box>}
+            <Box p={3}>{children}</Box>
         </Typography>
     );
 };
