@@ -8,11 +8,12 @@ import {
 import AuthorizationPage from "./AuthorizationPage";
 import CallbackPage from "./CallbackPage";
 import MainPage from "./MainPage";
-import {Tab, Tabs} from "@material-ui/core";
+import {LinearProgress, Snackbar, Tab, Tabs} from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 import Settings from "./main-page/Settings";
 import {a11yProps, TabPanel} from "./tabUtils";
 import {Settings as SettingsIcon} from "@material-ui/icons";
+import {Alert as MuiAlert} from "@material-ui/lab";
 
 
 const CONSTANTS = {
@@ -25,7 +26,61 @@ const CONSTANTS = {
     },
 };
 
-class RootPage extends React.Component {
+export interface IUIUtils {
+    setLoading: (loading: boolean) => void;
+    showWarningToast: (message: string) => void;
+}
+
+function Alert(props: any) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
+interface IToastState {
+    open: boolean;
+    message: string;
+    severity: string;
+}
+
+interface IRootPageState {
+    toastState: IToastState;
+    loading: boolean;
+}
+
+class RootPage extends React.Component<{}, IRootPageState> {
+    constructor(props: {}) {
+        super(props);
+        const toastState: IToastState = {
+            open: false,
+            message: "",
+            severity: "error",
+        };
+        this.state = {toastState, loading: false};
+    }
+
+    private handleSnackbarClose = (_: any, reason: string) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        let {toastState} = this.state;
+        toastState.open = false;
+
+        this.setState({toastState});
+    };
+
+    private showWarningToast = (message: string) => {
+        const toastState = {
+            open: true,
+            message,
+            severity: "warning",
+        };
+
+        this.setState({toastState});
+    };
+
+    private setLoading = (loading: boolean) => {
+        this.setState({loading});
+    };
+
     render() {
         return (
             <Router>
@@ -48,11 +103,19 @@ class RootPage extends React.Component {
                                              hidden={hideLeftmostTabs} {...a11yProps(CONSTANTS.TAB_INDEXES.CALLBACK)}/>
                                     </Tabs>
                                 </AppBar>
+                                {this.state.loading &&
+                                <LinearProgress/>
+                                }
+                                <Snackbar open={this.state.toastState.open} autoHideDuration={5000} onClose={this.handleSnackbarClose}>
+                                    <Alert onClose={this.handleSnackbarClose} severity={this.state.toastState.severity}>
+                                        {this.state.toastState.message}
+                                    </Alert>
+                                </Snackbar>
                                 <Switch>
                                     <Route exact path={"/"}>
                                         <TabPanel index={CONSTANTS.TAB_INDEXES.EXPENSES}
                                                   value={selectedTab}>
-                                            <MainPage/>
+                                            <MainPage setLoading={this.setLoading} showWarningToast={this.showWarningToast}/>
                                         </TabPanel>
                                     </Route>
                                     <Route path={"/settings"}>
