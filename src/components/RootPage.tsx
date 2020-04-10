@@ -5,12 +5,12 @@ import {
     Route,
     Link,
 } from "react-router-dom";
-import AuthorizationPage from "./AuthorizationPage";
-import CallbackPage from "./CallbackPage";
-import MainPage from "./MainPage";
+import AuthorizationPage from "./secondary/AuthorizationPage";
+import CallbackPage from "./secondary/CallbackPage";
+import MainPage from "./main-page/MainPage";
 import {LinearProgress, Snackbar, Tab, Tabs} from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
-import Settings from "./main-page/Settings";
+import Settings from "./settings/Settings";
 import {a11yProps, TabPanel} from "./tabUtils";
 import {Settings as SettingsIcon} from "@material-ui/icons";
 import {Alert as MuiAlert} from "@material-ui/lab";

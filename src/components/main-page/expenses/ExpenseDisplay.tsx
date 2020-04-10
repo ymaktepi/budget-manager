@@ -3,7 +3,7 @@ import {Box, Grid, LinearProgress} from "@material-ui/core";
 import {ICategoryFrame, IExpenseLog} from "../../../utils/types";
 import Paper from "@material-ui/core/Paper";
 import {Typography} from '@material-ui/core';
-import EntryAdder from "../common/EntryAdder";
+import EntryAdder from "../../common/EntryAdder";
 import moment from "moment";
 import "./expenses.css";
 

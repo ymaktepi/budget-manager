@@ -1,6 +1,6 @@
 import React from "react";
 import {Button} from "@material-ui/core";
-import {generateToken, getClientFromStorage} from "../utils/clientUtils";
+import {generateToken, getClientFromStorage} from "../../utils/clientUtils";
 
 class AuthorizationPage extends React.Component<any, any> {
     render() {

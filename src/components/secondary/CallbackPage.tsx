@@ -1,6 +1,6 @@
 import React from 'react';
-import {getNewClient, saveTokens} from "../utils/clientUtils";
-import {log, warn} from "../utils/simpleLogger";
+import {getNewClient, saveTokens} from "../../utils/clientUtils";
+import {log, warn} from "../../utils/simpleLogger";
 
 
 class CallbackPage extends React.Component {

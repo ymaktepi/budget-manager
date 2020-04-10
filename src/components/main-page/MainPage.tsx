@@ -1,13 +1,13 @@
 import React from "react";
-import {getClientFromStorageOrRedirect} from "../utils/clientUtils";
+import {getClientFromStorageOrRedirect} from "../../utils/clientUtils";
 import {google, sheets_v4} from "googleapis";
 import {OAuth2Client} from "google-auth-library";
-import {addCategory, addExpense, getAllData} from "../utils/sheetsUtils";
-import {ICategoryFrame, ICategoryLog, IExpenseLog} from "../utils/types";
-import {warn} from "../utils/simpleLogger";
-import Expenses from "./main-page/expenses/Expenses";
-import {SPREADSHEET_ID} from "./constants";
-import {IUIUtils} from "./RootPage";
+import {addCategory, addExpense, getAllData} from "../../utils/sheetsUtils";
+import {ICategoryFrame, ICategoryLog, IExpenseLog} from "../../utils/types";
+import {warn} from "../../utils/simpleLogger";
+import Expenses from "./expenses/Expenses";
+import {SPREADSHEET_ID} from "../constants";
+import {IUIUtils} from "../RootPage";
 
 interface IMainPageProps extends IUIUtils {
 }

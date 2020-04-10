@@ -1,10 +1,11 @@
 import React from "react";
-import {Grid, Typography} from "@material-ui/core";
+import {Typography} from "@material-ui/core";
 import {ICategoryFrame, ICategoryLog, IExpenseLog} from "../../../utils/types";
 import ExpenseDisplay from "./ExpenseDisplay";
-import EntryAdder from "../common/EntryAdder";
-import Paper from "@material-ui/core/Paper";
+import EntryAdder from "../../common/EntryAdder";
 import './expenses.css';
+import {MainContainer} from "../../common/MainContainer";
+import {MainItem} from "../../common/MainItem";
 
 interface IExpensesProps {
     expensesData: Map<string, ICategoryFrame>;
@@ -34,19 +35,17 @@ class Expenses extends React.Component<IExpensesProps, {}> {
                 .map(frame => <ExpenseDisplay categoryFrame={frame} key={frame.category.name}
                                               onNewExpense={this.props.addExpense}/>);
         return (
-            <Grid container spacing={3} alignItems={"baseline"} direction={"row"}>
+            <MainContainer>
                 {listExpensesDisplays}
-                <Grid item xs={12} sm={6} md={4}>
-                    <Paper className={"tile"}>
-                        <div className={"bottom-margin"}>
+                <MainItem>
+                    <div className={"bottom-margin"}>
                         <Typography variant={"h5"}>
                             Add new category
                         </Typography>
-                            </div>
-                        <EntryAdder placeholder={"Category Name"} onNewEntry={this.handleNewCategory}/>
-                    </Paper>
-                </Grid>
-            </Grid>
+                    </div>
+                    <EntryAdder placeholder={"Category Name"} onNewEntry={this.handleNewCategory}/>
+                </MainItem>
+            </MainContainer>
         );
     }
 }
