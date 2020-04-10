@@ -1,11 +1,11 @@
 import React from "react";
 import {Typography} from "@material-ui/core";
 import {ICategoryFrame, ICategoryLog, IExpenseLog} from "../../../utils/types";
-import ExpenseDisplay from "./ExpenseDisplay";
+import ExpensesDisplay from "./ExpensesDisplay";
 import EntryAdder from "../../common/EntryAdder";
 import './expenses.css';
 import {MainContainer} from "../../common/MainContainer";
-import {MainItem} from "../../common/MainItem";
+import {CardWithTitle} from "../../common/Card";
 import ExpensesSummary from "./ExpensesSummary";
 
 interface IExpensesProps {
@@ -26,21 +26,23 @@ class Expenses extends React.Component<IExpensesProps, {}> {
     };
 
     public render = () => {
-        const listExpensesDisplays =
+        // @ts-ignore does not recognise that content cannot be undefined due to filter
+        const categoryFrames: ICategoryFrame[] =
             Array.from(this.props.expensesData.keys())
                 .sort()
                 .map(sortedName => this.props.expensesData.get(sortedName))
-                .filter(frame => frame !== undefined)
-                // @ts-ignore does not recognise that frame cannot be undefined due to previous filter
-                .map(frame => <ExpenseDisplay categoryFrame={frame} key={frame.category.name}
-                                              onNewExpense={this.props.addExpense}/>);
+                .filter(frame => frame !== undefined);
+
+        const listExpensesDisplays =
+            categoryFrames.map(frame => <ExpensesDisplay categoryFrame={frame} key={frame.category.name}
+                                                         onNewExpense={this.props.addExpense}/>);
         return (
             <>
                 <MainContainer>
-                    <ExpensesSummary/>
-                    <MainItem title={"Add a new category"}>
+                    <ExpensesSummary categoryFrames={categoryFrames}/>
+                    <CardWithTitle title={"Add a new category"}>
                         <EntryAdder placeholder={"Category Name"} onNewEntry={this.handleNewCategory}/>
-                    </MainItem>
+                    </CardWithTitle>
                 </MainContainer>
                 <MainContainer>
                     {listExpensesDisplays}

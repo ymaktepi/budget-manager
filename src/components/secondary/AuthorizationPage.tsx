@@ -2,7 +2,7 @@ import React from "react";
 import {Button} from "@material-ui/core";
 import {generateToken, getClientFromStorage} from "../../utils/clientUtils";
 import {MainContainer} from "../common/MainContainer";
-import {MainItem} from "../common/MainItem";
+import {CardWithTitle} from "../common/Card";
 
 class AuthorizationPage extends React.Component<any, any> {
     render = () => {
@@ -12,12 +12,12 @@ class AuthorizationPage extends React.Component<any, any> {
         }
         return (
             <MainContainer>
-                <MainItem title={"Authorize this app"}>
+                <CardWithTitle title={"Authorize this app"}>
                     Authorization needed. Click here:
                     <Button onClick={() => generateToken()}>
                         GIVE AUTH LOL
                     </Button>
-                </MainItem>
+                </CardWithTitle>
             </MainContainer>
         );
     };

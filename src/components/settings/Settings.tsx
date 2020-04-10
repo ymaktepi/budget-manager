@@ -7,7 +7,7 @@ import {getClientFromStorageOrRedirect} from "../../utils/clientUtils";
 import {createSpreadsheet} from "../../utils/sheetsUtils";
 import {SPREADSHEET_ID} from "../constants";
 import {MainContainer} from "../common/MainContainer";
-import {MainItem} from "../common/MainItem";
+import {CardWithTitle} from "../common/Card";
 
 
 interface ISettingsState {
@@ -57,7 +57,7 @@ class Settings extends React.Component<{}, ISettingsState> {
     render = () => {
         return (
             <MainContainer>
-                <MainItem title={"Create a new spreadsheet"}>
+                <CardWithTitle title={"Create a new spreadsheet"}>
                     <Typography variant={"body1"}>
                         If you've never used this application, the first thing you need to do is to create a
                         spreadsheet.<br/>
@@ -66,8 +66,8 @@ class Settings extends React.Component<{}, ISettingsState> {
                     <Button onClick={this.createSpreadsheet} variant={"outlined"} fullWidth>
                         Create spreadsheet
                     </Button>
-                </MainItem>
-                <MainItem title={"Use an existing spreadsheet"}>
+                </CardWithTitle>
+                <CardWithTitle title={"Use an existing spreadsheet"}>
                     <Typography variant={"body1"}>
                         If you've already used this application but are using it from a new device, you can use an
                         existing
@@ -86,7 +86,7 @@ class Settings extends React.Component<{}, ISettingsState> {
                         Current spreadsheetID: <br/>
                         {this.state.spreadsheetId}
                     </Typography>
-                </MainItem>
+                </CardWithTitle>
             </MainContainer>
         );
     };
