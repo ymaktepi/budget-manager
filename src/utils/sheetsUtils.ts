@@ -73,7 +73,7 @@ const appendRow = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, 
     };
 
     return sheetsClient.spreadsheets.values.append(params).then((response) => {
-        return response.statusText === "OK";
+        return response.statusText === "OK" || response.status === 200;
     });
 };
 
