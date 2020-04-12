@@ -123,7 +123,8 @@ class RootPage extends React.Component<{}, IRootPageState> {
                                     <Route path={"/settings"}>
                                         <TabPanel index={CONSTANTS.TAB_INDEXES.SETTINGS}
                                                   value={selectedTab}>
-                                            <Settings/>
+                                            <Settings setLoading={this.setLoading}
+                                                      showWarningToast={this.showWarningToast}/>
                                         </TabPanel>
                                     </Route>
                                     <Route path={"/auth"}>

@@ -4,7 +4,7 @@ import {
     CURRENT_EXPENSES,
     INDEX_CURRENT_CATEGORIES,
     INDEX_CURRENT_EXPENSES
-} from "../components/constants";
+} from "./constants";
 import {debug, warn} from "./simpleLogger";
 import {ICategoryFrame, ICategoryLog, IExpenseLog} from "./types";
 import moment from "moment";
