@@ -4,7 +4,7 @@ import Button from "@material-ui/core/Button";
 import {OAuth2Client} from "google-auth-library";
 import {google, sheets_v4} from "googleapis";
 import {getClientFromStorageOrRedirect} from "../../utils/clientUtils";
-import {createSpreadsheet} from "../../utils/sheetsUtils";
+import {archive, createSpreadsheet} from "../../utils/sheetsUtils";
 import {SPREADSHEET_ID} from "../../utils/constants";
 import {MainContainer} from "../common/MainContainer";
 import {CardWithTitle} from "../common/Card";
@@ -59,7 +59,14 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
     };
 
     private archive = async () => {
-
+        if (this.state.valueInputArchive === "" || this.state.spreadsheetId === null) {
+            return;
+        }
+        if (await archive(this.state.sheets, this.state.spreadsheetId, this.state.valueInputArchive)) {
+            this.props.showSuccessToast("Archiving succeeded");
+        } else {
+            this.props.showWarningToast("Could not archive spreadsheet, probably a network issue.");
+        }
     };
 
     private createSpreadsheet = async () => {
@@ -116,10 +123,10 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                            onKeyPress={this.handleKeyPressArchive}
                            onChange={this.handleChangeArchive}
                            fullWidth
-                           />
-                           <Button onClick={this.archive} variant={"outlined"} fullWidth>
-                               Archive Sheet
-                           </Button>
+                    />
+                    <Button onClick={this.archive} variant={"outlined"} fullWidth>
+                        Archive Sheet
+                    </Button>
                 </CardWithTitle>
             </MainContainer>
         );

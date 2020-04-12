@@ -29,6 +29,7 @@ const CONSTANTS = {
 export interface IUIUtils {
     setLoading: (loading: boolean) => void;
     showWarningToast: (message: string) => void;
+    showSuccessToast: (message: string) => void;
 }
 
 function Alert(props: any) {
@@ -77,6 +78,16 @@ class RootPage extends React.Component<{}, IRootPageState> {
         this.setState({toastState});
     };
 
+    private showSuccessToast = (message: string) => {
+        const toastState = {
+            open: true,
+            message,
+            severity: "success",
+        };
+
+        this.setState({toastState});
+    };
+
     private setLoading = (loading: boolean) => {
         this.setState({loading});
     };
@@ -117,6 +128,7 @@ class RootPage extends React.Component<{}, IRootPageState> {
                                         <TabPanel index={CONSTANTS.TAB_INDEXES.EXPENSES}
                                                   value={selectedTab}>
                                             <MainPage setLoading={this.setLoading}
+                                                      showSuccessToast={this.showSuccessToast}
                                                       showWarningToast={this.showWarningToast}/>
                                         </TabPanel>
                                     </Route>
@@ -124,6 +136,7 @@ class RootPage extends React.Component<{}, IRootPageState> {
                                         <TabPanel index={CONSTANTS.TAB_INDEXES.SETTINGS}
                                                   value={selectedTab}>
                                             <Settings setLoading={this.setLoading}
+                                                      showSuccessToast={this.showSuccessToast}
                                                       showWarningToast={this.showWarningToast}/>
                                         </TabPanel>
                                     </Route>
