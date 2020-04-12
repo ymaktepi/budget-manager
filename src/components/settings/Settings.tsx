@@ -4,54 +4,80 @@ import Button from "@material-ui/core/Button";
 import {OAuth2Client} from "google-auth-library";
 import {google, sheets_v4} from "googleapis";
 import {getClientFromStorageOrRedirect} from "../../utils/clientUtils";
-import {createSpreadsheet} from "../../utils/sheetsUtils";
-import {SPREADSHEET_ID} from "../constants";
+import {archive, createSpreadsheet} from "../../utils/sheetsUtils";
+import {SPREADSHEET_ID} from "../../utils/constants";
 import {MainContainer} from "../common/MainContainer";
 import {CardWithTitle} from "../common/Card";
+import {IUIUtils} from "../RootPage";
 
+interface ISettingsProps extends IUIUtils {
+}
 
 interface ISettingsState {
-    value: string;
+    valueInputSpreadsheet: string;
+    valueInputArchive: string;
     spreadsheetId: string | null;
     client: OAuth2Client;
     sheets: sheets_v4.Sheets;
 }
 
-class Settings extends React.Component<{}, ISettingsState> {
+class Settings extends React.Component<ISettingsProps, ISettingsState> {
 
-    constructor(props: {}) {
+    constructor(props: ISettingsProps) {
         super(props);
         const spreadsheetId = localStorage.getItem(SPREADSHEET_ID);
         const client = getClientFromStorageOrRedirect();
         const sheets = google.sheets({version: "v4", auth: client});
-        this.state = {value: "", client, sheets, spreadsheetId};
+        this.state = {valueInputSpreadsheet: "", client, sheets, spreadsheetId, valueInputArchive: ""};
     }
 
-    private handleChange = (event: any) => {
-        this.setState({value: event.target.value});
+    private handleChangeSheet = (event: any) => {
+        this.setState({valueInputSpreadsheet: event.target.value});
     };
 
-    private handleKeyPress = (event: any) => {
+    private handleChangeArchive = (event: any) => {
+        this.setState({valueInputArchive: event.target.value});
+    };
+
+    private handleKeyPressSheet = (event: any) => {
         if (event.key === "Enter") {
             this.updateId();
         }
     };
 
+    private handleKeyPressArchive = async (event: any) => {
+        if (event.key === "Enter") {
+            this.archive();
+        }
+    };
+
     private updateId = () => {
-        if (this.state.value !== "") {
-            localStorage.setItem(SPREADSHEET_ID, this.state.value);
-            this.setState({spreadsheetId: this.state.value});
+        if (this.state.valueInputSpreadsheet !== "") {
+            localStorage.setItem(SPREADSHEET_ID, this.state.valueInputSpreadsheet);
+            this.setState({spreadsheetId: this.state.valueInputSpreadsheet});
+        }
+    };
+
+    private archive = async () => {
+        if (this.state.valueInputArchive === "" || this.state.spreadsheetId === null) {
+            return;
+        }
+        if (await archive(this.state.sheets, this.state.spreadsheetId, this.state.valueInputArchive)) {
+            this.props.showSuccessToast("Archiving succeeded");
+        } else {
+            this.props.showWarningToast("Could not archive spreadsheet, probably a network issue.");
         }
     };
 
     private createSpreadsheet = async () => {
+        this.props.setLoading(true);
         const id = await createSpreadsheet(this.state.sheets);
         if (id) {
             this.setState({spreadsheetId: id});
         } else {
-            //this.showWarningToast("Could not create spreadsheet, probably a network issue.");
+            this.props.showWarningToast("Could not create spreadsheet, probably a network issue.");
         }
-        //this.setLoading(false);
+        this.props.setLoading(false);
     };
 
     render = () => {
@@ -74,9 +100,9 @@ class Settings extends React.Component<{}, ISettingsState> {
                         spreadsheet. Insert your spreadsheet ID in the following form.
                     </Typography>
                     <Input placeholder={"Spreadsheet ID"}
-                           value={this.state.value}
-                           onKeyPress={this.handleKeyPress}
-                           onChange={this.handleChange}
+                           value={this.state.valueInputSpreadsheet}
+                           onKeyPress={this.handleKeyPressSheet}
+                           onChange={this.handleChangeSheet}
                            fullWidth
                     />
                     <Button onClick={this.updateId} variant={"outlined"} fullWidth>
@@ -86,6 +112,21 @@ class Settings extends React.Component<{}, ISettingsState> {
                         Current spreadsheetID: <br/>
                         {this.state.spreadsheetId}
                     </Typography>
+                </CardWithTitle>
+                <CardWithTitle title={"Archive current expenses"}>
+                    <Typography variant={"body1"}>
+                        This will copy the current expenses in a new sheet on your spreadsheet, and reset them.
+                        The categories will be kept.
+                    </Typography>
+                    <Input placeholder={"Archive Name"}
+                           value={this.state.valueInputArchive}
+                           onKeyPress={this.handleKeyPressArchive}
+                           onChange={this.handleChangeArchive}
+                           fullWidth
+                    />
+                    <Button onClick={this.archive} variant={"outlined"} fullWidth>
+                        Archive Sheet
+                    </Button>
                 </CardWithTitle>
             </MainContainer>
         );

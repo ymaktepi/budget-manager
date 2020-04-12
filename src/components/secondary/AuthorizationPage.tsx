@@ -13,9 +13,10 @@ class AuthorizationPage extends React.Component<any, any> {
         return (
             <MainContainer>
                 <CardWithTitle title={"Authorize this app"}>
-                    Authorization needed. Click here:
-                    <Button onClick={() => generateToken()}>
-                        GIVE AUTH LOL
+                    This application uses Google Sheets to store data. You therefore need to enable this application on
+                    your Google account. It will only be able to create new spreadsheets and interact with them.
+                    <Button onClick={() => generateToken()} variant={"outlined"}>
+                        Authorize this application
                     </Button>
                 </CardWithTitle>
             </MainContainer>

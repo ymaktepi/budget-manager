@@ -4,7 +4,7 @@ import {
     CURRENT_EXPENSES,
     INDEX_CURRENT_CATEGORIES,
     INDEX_CURRENT_EXPENSES
-} from "../components/constants";
+} from "./constants";
 import {debug, warn} from "./simpleLogger";
 import {ICategoryFrame, ICategoryLog, IExpenseLog} from "./types";
 import moment from "moment";
@@ -12,6 +12,10 @@ import moment from "moment";
 type ParamsCreateSheet = sheets_v4.Params$Resource$Spreadsheets$Create;
 type ParamsGetValues = sheets_v4.Params$Resource$Spreadsheets$Values$Get;
 type ParamsAppendValues = sheets_v4.Params$Resource$Spreadsheets$Values$Append;
+type ParamsDuplicateSheet = sheets_v4.Params$Resource$Spreadsheets$Batchupdate;
+type ParamsDeleteRange = sheets_v4.Params$Resource$Spreadsheets$Batchupdate;
+type Range = sheets_v4.Schema$GridRange;
+
 
 export const createSpreadsheet = async (sheetsClient: sheets_v4.Sheets) => {
     const params: ParamsCreateSheet = {
@@ -49,6 +53,10 @@ export const createSpreadsheet = async (sheetsClient: sheets_v4.Sheets) => {
     });
 };
 
+const validateResponse = (response: any) => {
+    return response.statusText === "OK" || response.status === 200;
+};
+
 export const addCategory = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, category: ICategoryLog) => {
     debug("addCategory", category);
     const row = [category.name, category.amount];
@@ -72,9 +80,7 @@ const appendRow = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, 
         valueInputOption: "USER_ENTERED",
     };
 
-    return sheetsClient.spreadsheets.values.append(params).then((response) => {
-        return response.statusText === "OK" || response.status === 200;
-    });
+    return sheetsClient.spreadsheets.values.append(params).then(validateResponse);
 };
 
 const getPage = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, sheetIndex: string): Promise<Array<Array<any>> | undefined> => {
@@ -84,6 +90,9 @@ const getPage = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, sh
     };
 
     return sheetsClient.spreadsheets.values.get(params).then((response) => {
+            if(!validateResponse(response)) {
+                return undefined;
+            }
             if (!response.data) {
                 return undefined;
             } else {
@@ -122,6 +131,94 @@ export const getExpenses = async (sheetsClient: sheets_v4.Sheets, spreadsheetId:
     ));
 };
 
+const getIdFromIndex = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, sourceSheetIndex: number) => {
+    debug("getIdFromIndex");
+    const data = await sheetsClient.spreadsheets.get({spreadsheetId, includeGridData: false})
+        .then(
+            response => {
+                if (validateResponse(response)) {
+                    return response.data;
+                } else {
+                    return undefined;
+                }
+            }
+        );
+    if (!data) {
+        return undefined;
+    }
+    if (!data.sheets) {
+        return undefined;
+    }
+    const id = data.sheets.find((value, index, obj) => {
+        if (!value.properties) {
+            return false;
+        }
+        return value.properties.index === sourceSheetIndex;
+    });
+    if (!id) {
+        return undefined;
+    }
+    if (!id.properties) {
+        return undefined;
+    }
+    return id.properties.sheetId;
+};
+
+const duplicateSheet = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, sourceSheetIndex: number, newSheetName: string, newSheetIndex: number): Promise<boolean> => {
+    debug("duplicateSheet");
+    const id = await getIdFromIndex(sheetsClient, spreadsheetId, sourceSheetIndex);
+    if (!id) {
+        return false;
+    }
+    const params: ParamsDuplicateSheet = {
+        spreadsheetId,
+        requestBody: {
+            requests: [
+                {
+                    duplicateSheet: {
+                        insertSheetIndex: newSheetIndex,
+                        newSheetName,
+                        // @ts-ignore cannot be undefined
+                        sourceSheetId: id,
+                    }
+                }
+            ],
+        }
+    };
+    return sheetsClient.spreadsheets.batchUpdate(params)
+        .catch(() => false)
+        .then(validateResponse);
+};
+
+const deleteExpenses = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string): Promise<boolean> => {
+    debug("deleteExpenses");
+
+    const id = await getIdFromIndex(sheetsClient, spreadsheetId, INDEX_CURRENT_EXPENSES);
+    if (!id) {
+        return false;
+    }
+
+    const range: Range = {
+        sheetId: id,
+    };
+
+    const params: ParamsDeleteRange = {
+        spreadsheetId,
+        requestBody: {
+            requests: [{
+                deleteRange: {
+                    range,
+                    shiftDimension: "ROWS",
+                }
+            }]
+        }
+    };
+
+    return sheetsClient.spreadsheets.batchUpdate(params)
+        .catch(() => false)
+        .then(validateResponse);
+};
+
 export const getAllData = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string): Promise<Map<string, ICategoryFrame> | undefined> => {
     const categoriesList = await getCategories(sheetsClient, spreadsheetId);
     if (!categoriesList) {
@@ -146,4 +243,14 @@ export const getAllData = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: 
         warn("could not get expenses");
     }
     return data;
+};
+
+export const archive = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, archiveName: string): Promise<boolean> => {
+    const categories = await getCategories(sheetsClient, spreadsheetId);
+    if (categories === undefined) {
+        return false;
+    }
+    return await duplicateSheet(sheetsClient, spreadsheetId, INDEX_CURRENT_EXPENSES, "Expenses " + archiveName, INDEX_CURRENT_EXPENSES + 2)
+        && await duplicateSheet(sheetsClient, spreadsheetId, INDEX_CURRENT_CATEGORIES, "Categories " + archiveName, INDEX_CURRENT_CATEGORIES + 2)
+        && await deleteExpenses(sheetsClient, spreadsheetId);
 };

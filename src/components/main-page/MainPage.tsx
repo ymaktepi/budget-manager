@@ -6,7 +6,7 @@ import {addCategory, addExpense, getAllData} from "../../utils/sheetsUtils";
 import {ICategoryFrame, ICategoryLog, IExpenseLog} from "../../utils/types";
 import {warn} from "../../utils/simpleLogger";
 import Expenses from "./expenses/Expenses";
-import {SPREADSHEET_ID} from "../constants";
+import {SPREADSHEET_ID} from "../../utils/constants";
 import {IUIUtils} from "../RootPage";
 
 interface IMainPageProps extends IUIUtils {
