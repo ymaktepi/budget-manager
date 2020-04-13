@@ -4,7 +4,7 @@ import Button from "@material-ui/core/Button";
 import {OAuth2Client} from "google-auth-library";
 import {google, sheets_v4} from "googleapis";
 import {getClientFromStorageOrRedirect} from "../../utils/clientUtils";
-import {archive, createSpreadsheet} from "../../utils/sheetsUtils";
+import {archive, createSpreadsheet, getLinkToSpreadsheet} from "../../utils/sheetsUtils";
 import {SPREADSHEET_ID} from "../../utils/constants";
 import {MainContainer} from "../common/MainContainer";
 import {CardWithTitle} from "../common/Card";
@@ -80,6 +80,21 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         this.props.setLoading(false);
     };
 
+    private goToSpreadsheet = async () => {
+        this.props.setLoading(true);
+        if (this.state.spreadsheetId) {
+            const link = await getLinkToSpreadsheet(this.state.sheets, this.state.spreadsheetId);
+            if (link) {
+                window.open(link);
+            } else {
+                this.props.showWarningToast("Could not go to spreadsheet, probably a network issue.");
+            }
+        } else {
+            this.props.showWarningToast("Could not go to spreadsheet, you need to create one first.");
+        }
+        this.props.setLoading(false);
+    };
+
     render = () => {
         return (
             <MainContainer>
@@ -112,6 +127,9 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                         Current spreadsheetID: <br/>
                         {this.state.spreadsheetId}
                     </Typography>
+                    <Button onClick={this.goToSpreadsheet} variant={"outlined"} fullWidth>
+                        View Spreadsheet
+                    </Button>
                 </CardWithTitle>
                 <CardWithTitle title={"Archive current expenses"}>
                     <Typography variant={"body1"}>

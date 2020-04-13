@@ -132,8 +132,19 @@ export const getExpenses = async (sheetsClient: sheets_v4.Sheets, spreadsheetId:
     ));
 };
 
-const getIdFromIndex = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, sourceSheetIndex: number) => {
-    debug("getIdFromIndex");
+export const getLinkToSpreadsheet = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string): Promise<string | undefined> => {
+    const data = await getSpreadsheet(sheetsClient, spreadsheetId);
+    if (!data) {
+        return undefined;
+    }
+    if (data.spreadsheetUrl) {
+        return data.spreadsheetUrl;
+    } else {
+        return undefined;
+    }
+};
+
+const getSpreadsheet = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string) => {
     const data = await sheetsClient.spreadsheets.get({spreadsheetId, includeGridData: false})
         .then(
             response => {
@@ -144,6 +155,15 @@ const getIdFromIndex = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: str
                 }
             }
         );
+    if (!data) {
+        return undefined;
+    }
+    return data;
+};
+
+const getIdFromIndex = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, sourceSheetIndex: number) => {
+    debug("getIdFromIndex");
+    const data = await getSpreadsheet(sheetsClient, spreadsheetId);
     if (!data) {
         return undefined;
     }
@@ -243,7 +263,7 @@ export const archive = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: str
         await getDuplicateRequest(sheetsClient, spreadsheetId, INDEX_CURRENT_CATEGORIES, "Categories " + archiveName, INDEX_CURRENT_CATEGORIES + 1),
         await getDeleteExpensesRequest(sheetsClient, spreadsheetId),
     ];
-    if(requests.indexOf(undefined) >= 0) {
+    if (requests.indexOf(undefined) >= 0) {
         return false;
     }
     return performBatchUpdate(sheetsClient, spreadsheetId, requests);
