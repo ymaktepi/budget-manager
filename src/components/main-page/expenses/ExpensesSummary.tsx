@@ -36,8 +36,6 @@ class ExpensesSummary extends React.Component<IExpensesSummaryProps, {}> {
                 </Grid>
             </Card>
         );
-
-        return <div>et ta meere</div>
     };
 }
 

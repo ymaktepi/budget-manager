@@ -1,5 +1,4 @@
 import React from "react";
-import {Typography} from "@material-ui/core";
 import {ICategoryFrame, ICategoryLog, IExpenseLog} from "../../../utils/types";
 import ExpensesDisplay from "./ExpensesDisplay";
 import EntryAdder from "../../common/EntryAdder";
