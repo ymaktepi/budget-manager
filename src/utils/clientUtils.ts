@@ -3,7 +3,7 @@ import {Credentials, OAuth2Client} from "google-auth-library";
 import {CLIENT_ID, CLIENT_SECRET, REDIRECT_URL} from "../config";
 import {debug} from "./simpleLogger";
 
-const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
+const SCOPES = "https://www.googleapis.com/auth/drive.file";
 
 // need to renew authentication. tokens are valid 1h.
 // 5 seconds before this hour is passed, auth is triggered again
