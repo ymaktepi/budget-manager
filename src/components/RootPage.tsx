@@ -12,17 +12,25 @@ import {LinearProgress, Snackbar, Tab, Tabs} from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 import Settings from "./settings/Settings";
 import {a11yProps, TabPanel} from "./tabUtils";
-import {Settings as SettingsIcon} from "@material-ui/icons";
+import {
+    Settings as SettingsIcon,
+    PermIdentity as PermIdentityIcon,
+    LocalAtm as LocalAtmIcon,
+    Lock as LockIcon,
+    HourglassEmpty as HourglassEmptyIcon
+} from "@material-ui/icons";
 import {Alert as MuiAlert} from "@material-ui/lab";
+import PrivacyPage from "./secondary/PrivacyPolicy";
 
 
 const CONSTANTS = {
-    TABS: ["/", "/settings", "/auth", "/callback"],
+    TABS: ["/", "/settings", "/privacy", "/auth", "/callback"],
     TAB_INDEXES: {
         EXPENSES: 0,
         SETTINGS: 1,
-        AUTH: 2,
-        CALLBACK: 3,
+        PRIVACY: 2,
+        AUTH: 3,
+        CALLBACK: 4,
     },
 };
 
@@ -104,13 +112,15 @@ class RootPage extends React.Component<{}, IRootPageState> {
                             <>
                                 <AppBar position="sticky">
                                     <Tabs value={selectedTab}>
-                                        <Tab label="Expenses" component={Link}
+                                        <Tab icon={<LocalAtmIcon/>} component={Link}
                                              to={"/"} {...a11yProps(CONSTANTS.TAB_INDEXES.EXPENSES)}/>
                                         <Tab icon={<SettingsIcon/>} component={Link}
-                                             to={"/settings"}{...a11yProps(CONSTANTS.TAB_INDEXES.SETTINGS)}/>
-                                        <Tab label={hideLeftmostTabs ? undefined : "Auth"}
+                                             to={"/settings"} {...a11yProps(CONSTANTS.TAB_INDEXES.SETTINGS)}/>
+                                        <Tab icon={<PermIdentityIcon/>} component={Link}
+                                             to={"/privacy"} {...a11yProps(CONSTANTS.TAB_INDEXES.PRIVACY)}/>
+                                        <Tab icon={hideLeftmostTabs ? undefined : <LockIcon/>}
                                              hidden={hideLeftmostTabs} {...a11yProps(CONSTANTS.TAB_INDEXES.AUTH)}/>
-                                        <Tab label={hideLeftmostTabs ? undefined : "Loading"}
+                                        <Tab icon={hideLeftmostTabs ? undefined : <HourglassEmptyIcon/>}
                                              hidden={hideLeftmostTabs} {...a11yProps(CONSTANTS.TAB_INDEXES.CALLBACK)}/>
                                     </Tabs>
                                     {this.state.loading &&
@@ -138,6 +148,12 @@ class RootPage extends React.Component<{}, IRootPageState> {
                                             <Settings setLoading={this.setLoading}
                                                       showSuccessToast={this.showSuccessToast}
                                                       showWarningToast={this.showWarningToast}/>
+                                        </TabPanel>
+                                    </Route>
+                                    <Route path={"/privacy"}>
+                                        <TabPanel index={CONSTANTS.TAB_INDEXES.PRIVACY}
+                                                  value={selectedTab}>
+                                            <PrivacyPage/>
                                         </TabPanel>
                                     </Route>
                                     <Route path={"/auth"}>
