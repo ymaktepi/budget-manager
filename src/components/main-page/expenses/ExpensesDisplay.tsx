@@ -1,5 +1,5 @@
 import React from "react";
-import {Box, Grid, LinearProgress} from "@material-ui/core";
+import {Grid, LinearProgress} from "@material-ui/core";
 import {ICategoryFrame, IExpenseLog} from "../../../utils/types";
 import EntryAdder from "../../common/EntryAdder";
 import moment from "moment";

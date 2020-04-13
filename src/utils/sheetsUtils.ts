@@ -14,6 +14,7 @@ type ParamsGetValues = sheets_v4.Params$Resource$Spreadsheets$Values$Get;
 type ParamsAppendValues = sheets_v4.Params$Resource$Spreadsheets$Values$Append;
 type ParamsDuplicateSheet = sheets_v4.Params$Resource$Spreadsheets$Batchupdate;
 type ParamsDeleteRange = sheets_v4.Params$Resource$Spreadsheets$Batchupdate;
+type ParamsBatchUpdate = sheets_v4.Params$Resource$Spreadsheets$Batchupdate;
 type Range = sheets_v4.Schema$GridRange;
 
 
@@ -90,7 +91,7 @@ const getPage = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, sh
     };
 
     return sheetsClient.spreadsheets.values.get(params).then((response) => {
-            if(!validateResponse(response)) {
+            if (!validateResponse(response)) {
                 return undefined;
             }
             if (!response.data) {
@@ -164,53 +165,44 @@ const getIdFromIndex = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: str
     return id.properties.sheetId;
 };
 
-const duplicateSheet = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, sourceSheetIndex: number, newSheetName: string, newSheetIndex: number): Promise<boolean> => {
-    debug("duplicateSheet");
+const getDuplicateRequest = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, sourceSheetIndex: number, newSheetName: string, newSheetIndex: number) => {
     const id = await getIdFromIndex(sheetsClient, spreadsheetId, sourceSheetIndex);
     if (!id) {
-        return false;
+        return undefined;
     }
-    const params: ParamsDuplicateSheet = {
-        spreadsheetId,
-        requestBody: {
-            requests: [
-                {
-                    duplicateSheet: {
-                        insertSheetIndex: newSheetIndex,
-                        newSheetName,
-                        // @ts-ignore cannot be undefined
-                        sourceSheetId: id,
-                    }
-                }
-            ],
+    return {
+        duplicateSheet: {
+            insertSheetIndex: newSheetIndex,
+            newSheetName,
+            // @ts-ignore cannot be undefined
+            sourceSheetId: id,
         }
-    };
-    return sheetsClient.spreadsheets.batchUpdate(params)
-        .catch(() => false)
-        .then(validateResponse);
+    }
 };
 
-const deleteExpenses = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string): Promise<boolean> => {
-    debug("deleteExpenses");
-
+const getDeleteExpensesRequest = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string) => {
     const id = await getIdFromIndex(sheetsClient, spreadsheetId, INDEX_CURRENT_EXPENSES);
     if (!id) {
-        return false;
+        return undefined;
     }
 
     const range: Range = {
         sheetId: id,
     };
 
-    const params: ParamsDeleteRange = {
+    return {
+        deleteRange: {
+            range,
+            shiftDimension: "ROWS",
+        }
+    }
+};
+
+const performBatchUpdate = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, requests: any[]) => {
+    const params: ParamsBatchUpdate = {
         spreadsheetId,
         requestBody: {
-            requests: [{
-                deleteRange: {
-                    range,
-                    shiftDimension: "ROWS",
-                }
-            }]
+            requests: requests,
         }
     };
 
@@ -246,11 +238,13 @@ export const getAllData = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: 
 };
 
 export const archive = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, archiveName: string): Promise<boolean> => {
-    const categories = await getCategories(sheetsClient, spreadsheetId);
-    if (categories === undefined) {
+    const requests = [
+        await getDuplicateRequest(sheetsClient, spreadsheetId, INDEX_CURRENT_EXPENSES, "Expenses " + archiveName, INDEX_CURRENT_CATEGORIES + 1),
+        await getDuplicateRequest(sheetsClient, spreadsheetId, INDEX_CURRENT_CATEGORIES, "Categories " + archiveName, INDEX_CURRENT_CATEGORIES + 1),
+        await getDeleteExpensesRequest(sheetsClient, spreadsheetId),
+    ];
+    if(requests.indexOf(undefined) >= 0) {
         return false;
     }
-    return await duplicateSheet(sheetsClient, spreadsheetId, INDEX_CURRENT_EXPENSES, "Expenses " + archiveName, INDEX_CURRENT_EXPENSES + 2)
-        && await duplicateSheet(sheetsClient, spreadsheetId, INDEX_CURRENT_CATEGORIES, "Categories " + archiveName, INDEX_CURRENT_CATEGORIES + 2)
-        && await deleteExpenses(sheetsClient, spreadsheetId);
+    return performBatchUpdate(sheetsClient, spreadsheetId, requests);
 };

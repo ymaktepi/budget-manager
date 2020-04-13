@@ -102,7 +102,7 @@ class RootPage extends React.Component<{}, IRootPageState> {
                         const hideLeftmostTabs = selectedTab < CONSTANTS.TAB_INDEXES.AUTH;
                         return (
                             <>
-                                <AppBar position="static">
+                                <AppBar position="sticky">
                                     <Tabs value={selectedTab}>
                                         <Tab label="Expenses" component={Link}
                                              to={"/"} {...a11yProps(CONSTANTS.TAB_INDEXES.EXPENSES)}/>
@@ -113,10 +113,10 @@ class RootPage extends React.Component<{}, IRootPageState> {
                                         <Tab label={hideLeftmostTabs ? undefined : "Loading"}
                                              hidden={hideLeftmostTabs} {...a11yProps(CONSTANTS.TAB_INDEXES.CALLBACK)}/>
                                     </Tabs>
+                                    {this.state.loading &&
+                                    <LinearProgress/>
+                                    }
                                 </AppBar>
-                                {this.state.loading &&
-                                <LinearProgress/>
-                                }
                                 <Snackbar open={this.state.toastState.open} autoHideDuration={5000}
                                           onClose={this.handleSnackbarClose}>
                                     <Alert onClose={this.handleSnackbarClose} severity={this.state.toastState.severity}>
