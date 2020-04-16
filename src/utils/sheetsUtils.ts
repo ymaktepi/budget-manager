@@ -95,13 +95,13 @@ const getPage = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, sh
                 return undefined;
             }
             if (!response.data) {
-                return undefined;
+                return [];
             } else {
                 const data = response.data;
                 if (!data || !data.values) {
-                    return undefined;
+                    return [];
                 }
-                return data.values as any[];//.flatMap(array => ({name: String(array[0]), amount: Number(array[1])}));
+                return data.values as any[];
             }
         }
     );
