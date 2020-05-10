@@ -62,11 +62,13 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         if (this.state.valueInputArchive === "" || this.state.spreadsheetId === null) {
             return;
         }
+        this.props.setLoading(true);
         if (await archive(this.state.sheets, this.state.spreadsheetId, this.state.valueInputArchive)) {
             this.props.showSuccessToast("Archiving succeeded");
         } else {
             this.props.showWarningToast("Could not archive spreadsheet, probably a network issue.");
         }
+        this.props.setLoading(false);
     };
 
     private createSpreadsheet = async () => {
