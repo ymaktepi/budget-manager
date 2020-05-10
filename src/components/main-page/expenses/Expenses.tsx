@@ -28,7 +28,6 @@ class Expenses extends React.Component<IExpensesProps, {}> {
         // @ts-ignore does not recognise that content cannot be undefined due to filter
         const categoryFrames: ICategoryFrame[] =
             Array.from(this.props.expensesData.keys())
-                .sort()
                 .map(sortedName => this.props.expensesData.get(sortedName))
                 .filter(frame => frame !== undefined);
 
