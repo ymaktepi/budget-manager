@@ -18,6 +18,8 @@ type ParamsBatchUpdate = sheets_v4.Params$Resource$Spreadsheets$Batchupdate;
 type Range = sheets_v4.Schema$GridRange;
 
 
+export const FIXED_TEXT = "fixed";
+
 export const createSpreadsheet = async (sheetsClient: sheets_v4.Sheets) => {
     const params: ParamsCreateSheet = {
         requestBody: {
@@ -61,6 +63,9 @@ const validateResponse = (response: any) => {
 export const addCategory = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string, category: ICategoryLog) => {
     debug("addCategory", category);
     const row = [category.name, category.amount];
+    if (category.fixed) {
+        row.push(FIXED_TEXT);
+    }
     return appendRow(sheetsClient, spreadsheetId, CURRENT_CATEGORIES, row);
 };
 
@@ -115,7 +120,11 @@ export const getCategories = async (sheetsClient: sheets_v4.Sheets, spreadsheetI
         debug("categories are undefined");
         return undefined;
     }
-    return values.flatMap(array => ({name: String(array[0]), amount: Number(array[1])}));
+    return values.flatMap(array => {
+            const fixed = array.length > 2 && array[2] === FIXED_TEXT;
+            return {name: String(array[0]), amount: Number(array[1]), fixed};
+        }
+    );
 };
 
 export const getExpenses = async (sheetsClient: sheets_v4.Sheets, spreadsheetId: string): Promise<IExpenseLog[] | undefined> => {

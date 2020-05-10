@@ -7,6 +7,8 @@ import {Grid, LinearProgress} from "@material-ui/core";
 
 interface IExpensesSummaryProps {
     categoryFrames: ICategoryFrame[];
+    title: string;
+    showIcon: boolean;
 }
 
 class ExpensesSummary extends React.Component<IExpensesSummaryProps, {}> {
@@ -28,7 +30,8 @@ class ExpensesSummary extends React.Component<IExpensesSummaryProps, {}> {
 
         return (
             <Card>
-                <RatioHeader title={"Expenses Summary"} totalAmount={totalAmount} usedAmount={usedAmount}/>
+                <RatioHeader title={this.props.title} totalAmount={totalAmount} usedAmount={usedAmount}
+                             showIcon={this.props.showIcon}/>
                 <LinearProgress variant={"determinate"} value={percentUsed} color={color}/>
                 <div className={"bottom-margin"}/>
                 <Grid container>

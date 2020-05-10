@@ -3,6 +3,7 @@ import {Moment} from "moment";
 export interface ICategoryLog {
     name: string;
     amount: number;
+    fixed: boolean;
 }
 
 export interface IExpenseLog {

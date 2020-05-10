@@ -1,22 +1,25 @@
 import React from "react";
-import {Input} from "@material-ui/core";
+import {Checkbox, FormControlLabel, Input} from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import {Add as AddIcon} from '@material-ui/icons';
 import "./entry-adder.css";
 
 interface IEntryAdderProps {
-    onNewEntry: (name: string, value: number) => void;
+    onNewEntry: (name: string, value: number, checked: boolean) => void;
     placeholder: string;
+    checkedTitle?: string;
 }
 
 interface IExpenseAdderState {
     name: string;
     value: number;
+    checked: boolean;
 }
 
 const DEFAULT_STATE = {
     name: "",
     value: 0.0,
+    checked: false,
 };
 
 class EntryAdder extends React.Component<IEntryAdderProps, IExpenseAdderState> {
@@ -33,6 +36,10 @@ class EntryAdder extends React.Component<IEntryAdderProps, IExpenseAdderState> {
         this.setState({value: event.target.value});
     };
 
+    private handleChangeChecked = (event: any) => {
+        this.setState({checked: event.target.value});
+    };
+
     private handleKeyPress = (event: any) => {
         if (event.key === "Enter") {
             this.addExpense();
@@ -42,7 +49,7 @@ class EntryAdder extends React.Component<IEntryAdderProps, IExpenseAdderState> {
 
     private addExpense = () => {
         if (this.state.value && this.state.name && this.state.name !== "") {
-            this.props.onNewEntry(this.state.name, Number(this.state.value));
+            this.props.onNewEntry(this.state.name, Number(this.state.value), this.state.checked);
         }
     };
 
@@ -65,6 +72,15 @@ class EntryAdder extends React.Component<IEntryAdderProps, IExpenseAdderState> {
                     onChange={this.handleChangeValue}
                     fullWidth={true}
                 />
+                {this.props.checkedTitle && (
+                    <FormControlLabel control={
+                        <Checkbox
+                            value={this.state.checked}
+                            onChange={this.handleChangeChecked}
+                        />
+                    } label={this.props.checkedTitle}
+                    />
+                )}
                 <div className={"align-center"}>
                     <IconButton aria-label={"Add"} onClick={this.addExpense}
                     >

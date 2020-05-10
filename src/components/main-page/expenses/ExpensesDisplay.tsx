@@ -8,6 +8,7 @@ import {Card} from "../../common/Card";
 import {SingleExpenseDisplay} from "../../common/SingleExpenseDisplay";
 import {RatioHeader} from "../../common/RatioHeader";
 
+
 interface IExpenseDisplayProps {
     categoryFrame: ICategoryFrame;
     onNewExpense: (expense: IExpenseLog) => void;
@@ -39,7 +40,8 @@ class ExpensesDisplay extends React.Component<IExpenseDisplayProps, {}> {
         const color = percentUsed >= 99 ? "secondary" : "primary";
         return (
             <Card>
-                <RatioHeader title={frame.category.name} totalAmount={frame.category.amount} usedAmount={amountUsed}/>
+                <RatioHeader title={frame.category.name} totalAmount={frame.category.amount} usedAmount={amountUsed}
+                             showIcon={frame.category.fixed}/>
                 <LinearProgress variant={"determinate"} value={percentUsed} color={color}/>
                 <div className={"bottom-margin"}/>
                 <Grid container>
