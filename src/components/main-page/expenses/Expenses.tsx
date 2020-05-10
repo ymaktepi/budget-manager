@@ -35,19 +35,25 @@ class Expenses extends React.Component<IExpensesProps, {}> {
         const listExpensesDisplays =
             categoryFrames.map(frame => <ExpensesDisplay categoryFrame={frame} key={frame.category.name}
                                                          onNewExpense={this.props.addExpense}/>);
+        const nonFixedCategories = categoryFrames.filter(frame => !frame.category.fixed);
+        const fixedCategories = categoryFrames.filter(frame => frame.category.fixed);
         return (
             <>
                 <MainContainer>
                     <ExpensesSummary title={"Expenses Summary"} categoryFrames={categoryFrames} showIcon={false}/>
+                    {fixedCategories.length > 0 &&
                     <ExpensesSummary title={"Fixed Categories"}
-                                     categoryFrames={categoryFrames.filter(frame => frame.category.fixed)}
+                                     categoryFrames={fixedCategories}
                                      showIcon={true}/>
+                    }
+                    {nonFixedCategories.length > 0 &&
                     <ExpensesSummary title={"Non-fixed Categories"}
-                                     categoryFrames={categoryFrames.filter(frame => !frame.category.fixed)}
+                                     categoryFrames={nonFixedCategories}
                                      showIcon={false}/>
+                    }
                     <CardWithTitle title={"Add a new category"}>
                         <EntryAdder placeholder={"Category Name"} onNewEntry={this.handleNewCategory}
-                                    checkedTitle={"Fixed Expense"}/>
+                                    checkedTitle={"Fixed Category"}/>
                     </CardWithTitle>
                 </MainContainer>
                 <MainContainer>
