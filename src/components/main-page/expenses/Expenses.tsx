@@ -14,11 +14,12 @@ interface IExpensesProps {
 }
 
 class Expenses extends React.Component<IExpensesProps, {}> {
-    private handleNewCategory = (name: string, value: number) => {
+    private handleNewCategory = (name: string, value: number, checked: boolean) => {
         if (value && name && name !== "") {
             const category: ICategoryLog = {
                 amount: value,
                 name,
+                fixed: checked,
             };
             this.props.addCategory(category);
         }
@@ -37,9 +38,16 @@ class Expenses extends React.Component<IExpensesProps, {}> {
         return (
             <>
                 <MainContainer>
-                    <ExpensesSummary categoryFrames={categoryFrames}/>
+                    <ExpensesSummary title={"Expenses Summary"} categoryFrames={categoryFrames} showIcon={false}/>
+                    <ExpensesSummary title={"Fixed Categories"}
+                                     categoryFrames={categoryFrames.filter(frame => frame.category.fixed)}
+                                     showIcon={true}/>
+                    <ExpensesSummary title={"Non-fixed Categories"}
+                                     categoryFrames={categoryFrames.filter(frame => !frame.category.fixed)}
+                                     showIcon={false}/>
                     <CardWithTitle title={"Add a new category"}>
-                        <EntryAdder placeholder={"Category Name"} onNewEntry={this.handleNewCategory}/>
+                        <EntryAdder placeholder={"Category Name"} onNewEntry={this.handleNewCategory}
+                                    checkedTitle={"Fixed Expense"}/>
                     </CardWithTitle>
                 </MainContainer>
                 <MainContainer>
