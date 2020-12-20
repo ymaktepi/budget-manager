@@ -33,7 +33,7 @@ class ExpensesDisplay extends React.Component<IExpenseDisplayProps, {}> {
         const frame = this.props.categoryFrame;
         const amountUsed = frame.expenses.reduce((sum, current) => sum + Number(current.amount), 0);
         const listItems = frame.expenses.map(expense => (
-            <SingleExpenseDisplay name={expense.name} amount={expense.amount.toFixed(0)}
+            <SingleExpenseDisplay name={expense.name} amount={expense.amount.toFixed(0)} date={expense.date.toDate()}
                                   key={expense.amount + expense.name + expense.date}/>
         ));
         const percentUsed = Math.round(Math.min(100, amountUsed / frame.category.amount * 100));

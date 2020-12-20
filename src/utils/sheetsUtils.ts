@@ -134,7 +134,6 @@ export const getExpenses = async (sheetsClient: sheets_v4.Sheets, spreadsheetId:
         debug("Expenses are undefined");
         return undefined;
     }
-    console.debug(values);
     return values.flatMap(array => ({
             date: moment(String(array[0])), category: String(array[1]), name: String(array[2]), amount: Number(array[3])
         }

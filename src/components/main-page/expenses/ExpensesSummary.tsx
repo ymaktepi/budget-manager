@@ -2,7 +2,7 @@ import React from "react";
 import {ICategoryFrame} from "../../../utils/types";
 import {RatioHeader} from "../../common/RatioHeader";
 import {Card} from "../../common/Card";
-import {SingleExpenseDisplay} from "../../common/SingleExpenseDisplay";
+import {SingleCategoryDisplay} from "../../common/SingleCategoryDisplay";
 import {Grid, LinearProgress} from "@material-ui/core";
 
 interface IExpensesSummaryProps {
@@ -22,8 +22,8 @@ class ExpensesSummary extends React.Component<IExpensesSummaryProps, {}> {
         const usedAmount = listCategories.reduce((sum, current) => sum + Number(current.amountUsed), 0);
 
         const listItems = listCategories.map(category => (
-            <SingleExpenseDisplay name={category.name} amount={category.amountUsed + "/" + category.amount}
-                                  key={category.name}/>
+            <SingleCategoryDisplay name={category.name} amount={category.amountUsed + "/" + category.amount}
+                                   key={category.name}/>
         ));
         const percentUsed = Math.round(Math.min(100, usedAmount / totalAmount * 100));
         const color = percentUsed >= 99 ? "secondary" : "primary";
