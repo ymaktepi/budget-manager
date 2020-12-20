@@ -27,8 +27,8 @@ jobs:
     - name: Setup version
       run: |
           export VERSION=$(cat VERSION)
-          echo "::set-env name=VERSION::$VERSION"
-          echo "::set-env name=NEW_VERSION::$(awk -F. '/[0-9]+\./{$NF++;print}' OFS=. <<< $VERSION)"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "NEW_VERSION=$(awk -F. '/[0-9]+\./{$NF++;print}' OFS=. <<< $VERSION)" >> $GITHUB_ENV
       
     # Runs a single command using the runners shell
     - name: Docker build
