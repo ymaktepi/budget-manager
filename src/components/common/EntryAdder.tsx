@@ -37,7 +37,7 @@ class EntryAdder extends React.Component<IEntryAdderProps, IExpenseAdderState> {
     };
 
     private handleChangeChecked = (event: any) => {
-        this.setState({checked: event.target.value});
+        this.setState({checked: event.target.checked});
     };
 
     private handleKeyPress = (event: any) => {
